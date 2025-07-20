@@ -12,7 +12,7 @@ jobs:
   php-security:
     name: PHP Security Analysis
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -38,7 +38,7 @@ jobs:
         run: vendor/bin/psalm --version
 
       - name: Run Psalm security analysis
-        run: vendor/bin/psalm --show-info=false --no-cache --report=results.xml --config=psalm-security.xml
+        run: vendor/bin/psalm --show-info=false --no-cache --report=results.xml --config=psalm.xml
 
       - name: Upload Psalm results
         uses: actions/upload-artifact@v4
@@ -51,7 +51,7 @@ jobs:
   dependency-scan:
     name: Dependency Vulnerability Scan
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -78,7 +78,7 @@ jobs:
   secrets-scan:
     name: Secrets Detection
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
