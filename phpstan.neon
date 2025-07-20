@@ -1,0 +1,27 @@
+includes:
+    - vendor/nunomaduro/larastan/extension.neon
+
+parameters:
+    paths:
+        - app/
+        - config/
+        - database/
+        - routes/
+        - tests/
+    
+    level: 5
+    
+    ignoreErrors:
+        # Ignore blade template errors
+        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder.*#'
+        
+    excludePaths:
+        - vendor/
+        - storage/
+        - bootstrap/cache/
+        - node_modules/
+        
+    checkMissingIterableValueType: false
+    
+    stubFiles:
+        - vendor/nunomaduro/larastan/stubs/common.stub

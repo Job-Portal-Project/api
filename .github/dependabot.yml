@@ -1,0 +1,66 @@
+version: 2
+
+updates:
+  # PHP Composer dependencies
+  - package-ecosystem: "composer"
+    directory: "/"
+    target-branch: "1.x"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "job-portal-team"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "composer"
+    ignore:
+      # Ignore Laravel framework major version updates (manual review required)
+      - dependency-name: "laravel/framework"
+        update-types: ["version-update:semver-major"]
+
+  # NPM dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    target-branch: "1.x"
+    schedule:
+      interval: "weekly"
+      day: "monday" 
+      time: "09:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "job-portal-team"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "npm"
+    ignore:
+      # Ignore major version updates for build tools (manual review required)
+      - dependency-name: "vite"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "tailwindcss"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    target-branch: "1.x"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 3
+    reviewers:
+      - "job-portal-team"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    labels:
+      - "dependencies"
+      - "github-actions"
