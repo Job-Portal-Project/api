@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
         run: |
           TAG_NAME=${GITHUB_REF#refs/tags/}
           echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
-          
+
           # Check if this is a pre-release (contains -, alpha, beta, rc)
           if [[ $TAG_NAME =~ (alpha|beta|rc|-) ]]; then
             echo "is_prerelease=true" >> $GITHUB_OUTPUT
@@ -43,10 +43,10 @@ jobs:
         run: |
           TAG_NAME="${{ steps.tag_info.outputs.tag_name }}"
           PREV_TAG="${{ steps.prev_tag.outputs.prev_tag }}"
-          
+
           echo "## What's Changed" > CHANGELOG.md
           echo "" >> CHANGELOG.md
-          
+
           if [ -n "$PREV_TAG" ]; then
             # Get commits since previous tag
             git log --pretty=format:"* %s (%h)" $PREV_TAG..HEAD --reverse >> CHANGELOG.md
@@ -60,7 +60,7 @@ jobs:
             echo "" >> CHANGELOG.md
             echo "**Initial Release**" >> CHANGELOG.md
           fi
-          
+
           # Read the changelog content for the release
           CHANGELOG_CONTENT=$(cat CHANGELOG.md)
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
@@ -80,12 +80,18 @@ jobs:
           prerelease: ${{ steps.tag_info.outputs.is_prerelease }}
 
       - name: Notify release creation
-        if: always()
-        uses: 8398a7/action-slack@v3
+        uses: slackapi/slack-github-action@v2.1.1
         with:
-          status: ${{ job.status }}
-          text: |
-            Release ${{ steps.tag_info.outputs.tag_name }} has been created!
-            ${{ steps.create_release.outputs.html_url }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: |
+              Release ${{ steps.tag_info.outputs.tag_name }} has been created!
+              ${{ steps.create_release.outputs.html_url }}
+            blocks:
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: |
+                    Release ${{ steps.tag_info.outputs.tag_name }} has been created!
+                    ${{ steps.create_release.outputs.html_url }}
