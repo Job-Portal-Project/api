@@ -8,14 +8,13 @@ parameters:
         - database/
         - routes/
         - tests/
-    
+
     level: 5
-    
+
     ignoreErrors: []
-        
+
     excludePaths:
         - vendor/
         - storage/
         - bootstrap/cache/
-        - node_modules/
-        
+
