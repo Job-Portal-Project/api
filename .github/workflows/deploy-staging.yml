@@ -20,7 +20,7 @@ jobs:
     name: Manual Staging Deployment
     runs-on: ubuntu-latest
     environment: staging
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -38,7 +38,7 @@ jobs:
 
 
       - name: Deploy to staging
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.STAGING_HOST }}
           username: ${{ secrets.STAGING_USERNAME }}
@@ -54,9 +54,14 @@ jobs:
             sudo service nginx restart
 
       - name: Notify staging deployment
-        uses: 8398a7/action-slack@v3
+        uses: slackapi/slack-github-action@v2.1.1
         with:
-          status: ${{ job.status }}
-          text: "Staging deployment from branch ${{ github.event.inputs.branch }} ${{ job.status }}"
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: "Staging deployment from branch ${{ github.event.inputs.branch }} ${{ job.status }}"
+            blocks:
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "Staging deployment from branch ${{ github.event.inputs.branch }} ${{ job.status }}"

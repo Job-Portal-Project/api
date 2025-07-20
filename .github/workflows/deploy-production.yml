@@ -11,7 +11,7 @@ jobs:
   pre-deployment-checks:
     name: Pre-deployment Checks
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -24,6 +24,23 @@ jobs:
 
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Create environment file
+        run: cp .env.example .env
+
+      - name: Set database to SQLite for testing
+        run: |
+          sed -i 's/DB_CONNECTION=pgsql/DB_CONNECTION=sqlite/' .env
+          sed -i 's/DB_DATABASE=jobportal/DB_DATABASE=database\/database.sqlite/' .env
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Create database
+        run: touch database/database.sqlite
+
+      - name: Run database migrations
+        run: php artisan migrate --force
 
       - name: Run full test suite
         run: vendor/bin/phpunit
@@ -42,10 +59,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: pre-deployment-checks
     environment: production
-    
+
     steps:
       - name: Create database backup
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
           username: ${{ secrets.PRODUCTION_USERNAME }}
@@ -54,13 +71,13 @@ jobs:
           script: |
             cd ${{ secrets.PRODUCTION_PATH }}
             php artisan backup:run --only-db
-            
+
   deploy:
     name: Deploy to Production
     runs-on: ubuntu-latest
     needs: [pre-deployment-checks, backup]
     environment: production
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -87,7 +104,7 @@ jobs:
         run: tar -czf "${GITHUB_SHA}".tar.gz --exclude=*.git --exclude=node_modules --exclude=tests *
 
       - name: Deploy to production server
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
           username: ${{ secrets.PRODUCTION_USERNAME }}
@@ -96,51 +113,51 @@ jobs:
           envs: GITHUB_SHA
           script: |
             cd ${{ secrets.PRODUCTION_PATH }}
-            
+
             # Create deployment directory
             mkdir -p releases/${{ github.sha }}
             cd releases/${{ github.sha }}
-            
+
             # Download and extract deployment artifact
             wget ${{ secrets.PRODUCTION_URL }}/artifacts/${{ github.sha }}.tar.gz
             tar -xzf ${{ github.sha }}.tar.gz
             rm ${{ github.sha }}.tar.gz
-            
+
             # Create environment file
             cp ../../.env.production .env
-            
+
             # Set proper permissions
             sudo chown -R www-data:www-data storage bootstrap/cache
             sudo chmod -R 775 storage bootstrap/cache
-            
+
             # Install dependencies and run optimizations
             composer install --no-dev --optimize-autoloader
             php artisan key:generate --force
-            
+
             # Enable maintenance mode on current release
             cd ${{ secrets.PRODUCTION_PATH }}/current
             php artisan down --retry=60 --allow=127.0.0.1
-            
+
             # Switch to new release
             cd ${{ secrets.PRODUCTION_PATH }}
             ln -nfs releases/${{ github.sha }} current
             cd current
-            
+
             # Run database migrations
             php artisan migrate --force
-            
+
             # Clear and cache configurations
             php artisan cache:clear
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
-            
+
             # Restart services
             sudo supervisorctl restart laravel-worker:*
-            
+
             # Disable maintenance mode
             php artisan up
-            
+
             # Restart web server
             sudo service nginx restart
 
@@ -159,7 +176,7 @@ jobs:
           exit 1
 
       - name: Cleanup old releases
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
           username: ${{ secrets.PRODUCTION_USERNAME }}
@@ -175,10 +192,10 @@ jobs:
     needs: deploy
     if: failure()
     environment: production
-    
+
     steps:
       - name: Rollback to previous release
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.PRODUCTION_HOST }}
           username: ${{ secrets.PRODUCTION_USERNAME }}
@@ -200,12 +217,17 @@ jobs:
     runs-on: ubuntu-latest
     needs: [deploy, rollback]
     if: always()
-    
+
     steps:
       - name: Notify deployment status
-        uses: 8398a7/action-slack@v3
+        uses: slackapi/slack-github-action@v2.1.1
         with:
-          status: ${{ job.status }}
-          text: "Production deployment ${{ job.status }} for commit ${{ github.sha }}"
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: "Production deployment ${{ job.status }} for commit ${{ github.sha }}"
+            blocks:
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "Production deployment ${{ job.status }} for commit ${{ github.sha }}"
