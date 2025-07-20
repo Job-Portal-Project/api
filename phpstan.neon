@@ -1,5 +1,5 @@
 includes:
-    - vendor/nunomaduro/larastan/extension.neon
+    - vendor/larastan/larastan/extension.neon
 
 parameters:
     paths:
@@ -11,9 +11,7 @@ parameters:
     
     level: 5
     
-    ignoreErrors:
-        # Ignore blade template errors
-        - '#Call to an undefined method Illuminate\\Database\\Eloquent\\Builder.*#'
+    ignoreErrors: []
         
     excludePaths:
         - vendor/
@@ -21,7 +19,3 @@ parameters:
         - bootstrap/cache/
         - node_modules/
         
-    checkMissingIterableValueType: false
-    
-    stubFiles:
-        - vendor/nunomaduro/larastan/stubs/common.stub
