@@ -34,11 +34,8 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
-      - name: Install Psalm
-        run: composer require --dev vimeo/psalm psalm/plugin-laravel --no-interaction
-
-      - name: Initialize Psalm config
-        run: vendor/bin/psalm --init src/ app/ --level=4
+      - name: Verify Psalm installation
+        run: vendor/bin/psalm --version
 
       - name: Run Psalm security analysis
         run: vendor/bin/psalm --show-info=true --stats --report=results.xml
