@@ -36,17 +36,6 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress --optimize-autoloader --no-dev
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install NPM dependencies
-        run: npm ci
-
-      - name: Build assets
-        run: npm run build
 
       - name: Deploy to staging
         uses: appleboy/ssh-action@v1.0.3
@@ -59,7 +48,6 @@ jobs:
             cd ${{ secrets.STAGING_PATH }}
             git pull origin ${{ github.event.inputs.branch }}
             composer install --no-dev --optimize-autoloader
-            npm ci && npm run build
             php artisan migrate --force
             php artisan cache:clear
             php artisan config:cache

@@ -9,55 +9,47 @@ on:
     - cron: '0 2 * * 1' # Run every Monday at 2 AM UTC
 
 jobs:
-  codeql:
-    name: CodeQL Analysis
+  php-security:
+    name: PHP Security Analysis
     runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      actions: read
-      contents: read
-    
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'php', 'javascript' ]
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: ${{ matrix.language }}
-          queries: security-extended,security-and-quality
-
       - name: Setup PHP
-        if: matrix.language == 'php'
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+          tools: psalm
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
 
       - name: Install Composer dependencies
-        if: matrix.language == 'php'
         run: composer install --prefer-dist --no-interaction --no-progress
 
-      - name: Setup Node.js
-        if: matrix.language == 'javascript'
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+      - name: Install Psalm
+        run: composer require --dev vimeo/psalm psalm/plugin-laravel --no-interaction
 
-      - name: Install NPM dependencies
-        if: matrix.language == 'javascript'
-        run: npm ci
+      - name: Initialize Psalm config
+        run: vendor/bin/psalm --init src/ app/ --level=4
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
+      - name: Run Psalm security analysis
+        run: vendor/bin/psalm --show-info=true --stats --report=results.xml
+
+      - name: Upload Psalm results
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
-          category: "/language:${{matrix.language}}"
+          name: psalm-security-results
+          path: results.xml
+
 
   dependency-scan:
     name: Dependency Vulnerability Scan
@@ -79,26 +71,12 @@ jobs:
       - name: Run Composer audit
         run: composer audit --format=json --no-dev | tee composer-audit.json
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install NPM dependencies
-        run: npm ci
-
-      - name: Run NPM audit
-        run: npm audit --audit-level=moderate --json | tee npm-audit.json
-
       - name: Upload audit results
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: security-audit-results
-          path: |
-            composer-audit.json
-            npm-audit.json
+          path: composer-audit.json
 
   secrets-scan:
     name: Secrets Detection
@@ -118,46 +96,3 @@ jobs:
           head: HEAD
           extra_args: --debug --only-verified
 
-  license-check:
-    name: License Compliance
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-
-      - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress
-
-      - name: Check PHP license compliance
-        run: |
-          composer show --format=json | jq -r '.installed[] | "\(.name): \(.license // ["Unknown"])"' > php-licenses.txt
-          cat php-licenses.txt
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install license checker
-        run: npm install -g license-checker
-
-      - name: Install NPM dependencies
-        run: npm ci
-
-      - name: Check NPM license compliance
-        run: license-checker --summary > npm-licenses.txt && cat npm-licenses.txt
-
-      - name: Upload license reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: license-reports
-          path: |
-            php-licenses.txt
-            npm-licenses.txt

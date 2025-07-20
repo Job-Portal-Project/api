@@ -81,20 +81,6 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress --optimize-autoloader --no-dev
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install NPM dependencies
-        run: npm ci
-
-      - name: Build assets for production
-        run: npm run build
-        env:
-          NODE_ENV: production
-
       - name: Create deployment artifact
         env:
           GITHUB_SHA: ${{ github.sha }}
