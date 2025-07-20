@@ -1,0 +1,211 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ 1.x ]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  pre-deployment-checks:
+    name: Pre-deployment Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Run full test suite
+        run: vendor/bin/phpunit
+
+      - name: Run static analysis
+        run: vendor/bin/phpstan analyse --memory-limit=2G
+
+      - name: Check code formatting
+        run: vendor/bin/pint --test
+
+      - name: Security audit
+        run: composer audit
+
+  backup:
+    name: Create Database Backup
+    runs-on: ubuntu-latest
+    needs: pre-deployment-checks
+    environment: production
+    
+    steps:
+      - name: Create database backup
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USERNAME }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          port: ${{ secrets.PRODUCTION_PORT }}
+          script: |
+            cd ${{ secrets.PRODUCTION_PATH }}
+            php artisan backup:run --only-db
+            
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [pre-deployment-checks, backup]
+    environment: production
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress --optimize-autoloader --no-dev
+
+      - name: Create deployment artifact
+        env:
+          GITHUB_SHA: ${{ github.sha }}
+        run: tar -czf "${GITHUB_SHA}".tar.gz --exclude=*.git --exclude=node_modules --exclude=tests *
+
+      - name: Deploy to production server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USERNAME }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          port: ${{ secrets.PRODUCTION_PORT }}
+          envs: GITHUB_SHA
+          script: |
+            cd ${{ secrets.PRODUCTION_PATH }}
+            
+            # Create deployment directory
+            mkdir -p releases/${{ github.sha }}
+            cd releases/${{ github.sha }}
+            
+            # Download and extract deployment artifact
+            wget ${{ secrets.PRODUCTION_URL }}/artifacts/${{ github.sha }}.tar.gz
+            tar -xzf ${{ github.sha }}.tar.gz
+            rm ${{ github.sha }}.tar.gz
+            
+            # Create environment file
+            cp ../../.env.production .env
+            
+            # Set proper permissions
+            sudo chown -R www-data:www-data storage bootstrap/cache
+            sudo chmod -R 775 storage bootstrap/cache
+            
+            # Install dependencies and run optimizations
+            composer install --no-dev --optimize-autoloader
+            php artisan key:generate --force
+            
+            # Enable maintenance mode on current release
+            cd ${{ secrets.PRODUCTION_PATH }}/current
+            php artisan down --retry=60 --allow=127.0.0.1
+            
+            # Switch to new release
+            cd ${{ secrets.PRODUCTION_PATH }}
+            ln -nfs releases/${{ github.sha }} current
+            cd current
+            
+            # Run database migrations
+            php artisan migrate --force
+            
+            # Clear and cache configurations
+            php artisan cache:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            
+            # Restart services
+            sudo supervisorctl restart laravel-worker:*
+            
+            # Disable maintenance mode
+            php artisan up
+            
+            # Restart web server
+            sudo service nginx restart
+
+      - name: Run health check
+        run: |
+          sleep 60
+          for i in {1..5}; do
+            if curl -f ${{ secrets.PRODUCTION_URL }}/health; then
+              echo "Health check passed"
+              exit 0
+            fi
+            echo "Health check attempt $i failed, retrying..."
+            sleep 10
+          done
+          echo "Health check failed after 5 attempts"
+          exit 1
+
+      - name: Cleanup old releases
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USERNAME }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          port: ${{ secrets.PRODUCTION_PORT }}
+          script: |
+            cd ${{ secrets.PRODUCTION_PATH }}/releases
+            ls -t | tail -n +6 | xargs rm -rf
+
+  rollback:
+    name: Rollback on Failure
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: failure()
+    environment: production
+    
+    steps:
+      - name: Rollback to previous release
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PRODUCTION_HOST }}
+          username: ${{ secrets.PRODUCTION_USERNAME }}
+          key: ${{ secrets.PRODUCTION_SSH_KEY }}
+          port: ${{ secrets.PRODUCTION_PORT }}
+          script: |
+            cd ${{ secrets.PRODUCTION_PATH }}
+            PREVIOUS_RELEASE=$(ls -t releases | sed -n '2p')
+            if [ -n "$PREVIOUS_RELEASE" ]; then
+              ln -nfs releases/$PREVIOUS_RELEASE current
+              cd current
+              php artisan up
+              sudo service nginx restart
+              echo "Rolled back to release: $PREVIOUS_RELEASE"
+            fi
+
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [deploy, rollback]
+    if: always()
+    
+    steps:
+      - name: Notify deployment status
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: "Production deployment ${{ job.status }} for commit ${{ github.sha }}"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
