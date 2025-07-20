@@ -25,6 +25,23 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
+      - name: Create environment file
+        run: cp .env.example .env
+
+      - name: Set database to SQLite for testing
+        run: |
+          sed -i 's/DB_CONNECTION=pgsql/DB_CONNECTION=sqlite/' .env
+          sed -i 's/DB_DATABASE=jobportal/DB_DATABASE=database\/database.sqlite/' .env
+
+      - name: Generate application key
+        run: php artisan key:generate
+
+      - name: Create database
+        run: touch database/database.sqlite
+
+      - name: Run database migrations
+        run: php artisan migrate --force
+
       - name: Run full test suite
         run: vendor/bin/phpunit
 
