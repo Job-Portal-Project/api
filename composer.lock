@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5878e54e4dba0c5631ce628f6337ff87",
+    "content-hash": "db680d44b894ccedf6e577f9497b9e07",
     "packages": [
         {
             "name": "brick/math",
@@ -1055,6 +1055,58 @@
             "time": "2025-02-03T10:55:03+00:00"
         },
         {
+            "name": "kongulov/interact-with-enum",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kongulov/interact-with-enum.git",
+                "reference": "e5a0571a51f17ca5019219a843a935989e2974a0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kongulov/interact-with-enum/zipball/e5a0571a51f17ca5019219a843a935989e2974a0",
+                "reference": "e5a0571a51f17ca5019219a843a935989e2974a0",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Kongulov\\Traits\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ramiz Kongulov",
+                    "email": "ramiz.kongulov@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Trait for convenient use of ENUM in PHP",
+            "homepage": "https://github.com/kongulov/interact-with-enum",
+            "keywords": [
+                "enum",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/kongulov/interact-with-enum/issues",
+                "source": "https://github.com/kongulov/interact-with-enum/tree/1.1.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/kongulov",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-04-04T19:17:17+00:00"
+        },
+        {
             "name": "laravel/framework",
             "version": "v12.21.0",
             "source": {
@@ -1518,6 +1570,79 @@
                 "source": "https://github.com/laravel/tinker/tree/v2.10.1"
             },
             "time": "2025-01-27T14:24:01+00:00"
+        },
+        {
+            "name": "lcobucci/jwt",
+            "version": "5.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lcobucci/jwt.git",
+                "reference": "a835af59b030d3f2967725697cf88300f579088e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lcobucci/jwt/zipball/a835af59b030d3f2967725697cf88300f579088e",
+                "reference": "a835af59b030d3f2967725697cf88300f579088e",
+                "shasum": ""
+            },
+            "require": {
+                "ext-openssl": "*",
+                "ext-sodium": "*",
+                "php": "~8.2.0 || ~8.3.0 || ~8.4.0",
+                "psr/clock": "^1.0"
+            },
+            "require-dev": {
+                "infection/infection": "^0.29",
+                "lcobucci/clock": "^3.2",
+                "lcobucci/coding-standard": "^11.0",
+                "phpbench/phpbench": "^1.2",
+                "phpstan/extension-installer": "^1.2",
+                "phpstan/phpstan": "^1.10.7",
+                "phpstan/phpstan-deprecation-rules": "^1.1.3",
+                "phpstan/phpstan-phpunit": "^1.3.10",
+                "phpstan/phpstan-strict-rules": "^1.5.0",
+                "phpunit/phpunit": "^11.1"
+            },
+            "suggest": {
+                "lcobucci/clock": ">= 3.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Lcobucci\\JWT\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Luís Cobucci",
+                    "email": "lcobucci@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A simple library to work with JSON Web Token and JSON Web Signature",
+            "keywords": [
+                "JWS",
+                "jwt"
+            ],
+            "support": {
+                "issues": "https://github.com/lcobucci/jwt/issues",
+                "source": "https://github.com/lcobucci/jwt/tree/5.5.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/lcobucci",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/lcobucci",
+                    "type": "patreon"
+                }
+            ],
+            "time": "2025-01-26T21:29:45+00:00"
         },
         {
             "name": "league/commonmark",
