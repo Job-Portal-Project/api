@@ -25,6 +25,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     soap \
     && pecl install redis \
     && docker-php-ext-enable redis \
+    && docker-php-ext-install pgsql \
     && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 
