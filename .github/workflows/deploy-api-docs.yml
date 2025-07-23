@@ -52,8 +52,8 @@ jobs:
           <head>
             <meta charset="UTF-8">
             <title>Job Portal API Documentation</title>
-            <link rel="stylesheet" type="text/css" href="swagger-ui/swagger-ui-bundle.css" />
-            <link rel="stylesheet" type="text/css" href="swagger-ui/swagger-ui-standalone-preset.css" />
+            <link rel="stylesheet" type="text/css" href="swagger-ui/swagger-ui.css" />
+            <link rel="stylesheet" type="text/css" href="swagger-ui/index.css" />
             <style>
               html {
                 box-sizing: border-box;
