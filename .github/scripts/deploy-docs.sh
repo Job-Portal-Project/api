@@ -24,6 +24,13 @@ cp storage/api-docs/api-docs.json $DOCS_DIR/
 echo "📥 Downloading Swagger UI..."
 curl -sL https://github.com/swagger-api/swagger-ui/archive/refs/tags/v5.27.0.tar.gz | tar -xz
 cp -r swagger-ui-5.27.0/dist/* $DOCS_DIR/swagger-ui/
+# Ensure correct CSS filenames
+if [ -f "$DOCS_DIR/swagger-ui/swagger-ui-bundle.css" ]; then
+    cp $DOCS_DIR/swagger-ui/swagger-ui-bundle.css $DOCS_DIR/swagger-ui/swagger-ui.css
+fi
+if [ -f "$DOCS_DIR/swagger-ui/swagger-ui-standalone-preset.css" ]; then
+    cp $DOCS_DIR/swagger-ui/swagger-ui-standalone-preset.css $DOCS_DIR/swagger-ui/swagger-ui-standalone.css
+fi
 rm -rf swagger-ui-5.27.0
 
 echo "🌐 Creating HTML files..."
@@ -35,8 +42,8 @@ cat > $DOCS_DIR/index.html << 'EOF'
 <head>
   <meta charset="UTF-8">
   <title>Job Portal API Documentation</title>
-  <link rel="stylesheet" type="text/css" href="swagger-ui/swagger-ui-bundle.css" />
-  <link rel="stylesheet" type="text/css" href="swagger-ui/swagger-ui-standalone-preset.css" />
+  <link rel="stylesheet" type="text/css" href="swagger-ui/swagger-ui.css" />
+  <link rel="stylesheet" type="text/css" href="swagger-ui/swagger-ui-standalone.css" />
   <style>
     html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
     *, *:before, *:after { box-sizing: inherit; }
@@ -179,11 +186,23 @@ if [ -d ".git" ]; then
     # Create or switch to gh-pages branch
     git checkout --orphan gh-pages 2>/dev/null || git checkout gh-pages
     
-    # Remove all files except our docs
-    git rm -rf . 2>/dev/null || true
+    # Remove all files except our docs (but preserve .git)
+    find . -maxdepth 1 -not -name '.git' -not -name '.' -exec rm -rf {} + 2>/dev/null || true
     
     # Copy docs to root
     cp -r $DOCS_DIR/* .
+    
+    # Create .gitignore to exclude development files
+    cat > .gitignore << 'GITIGNORE_EOF'
+vendor/
+node_modules/
+.env*
+*.log
+composer.lock
+package-lock.json
+.DS_Store
+Thumbs.db
+GITIGNORE_EOF
     
     # Add and commit
     git add .
