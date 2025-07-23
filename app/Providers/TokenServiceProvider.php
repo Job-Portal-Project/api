@@ -3,9 +3,9 @@
 namespace App\Providers;
 
 use App\Contracts\JWT\TokenServiceInterface;
+use App\Services\Auth\Guard\TokenGuard;
 use App\Services\TokenService;
 use Illuminate\Auth\RequestGuard;
-use Illuminate\Auth\TokenGuard;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 
