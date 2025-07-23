@@ -1,6 +1,7 @@
 <?php
 
 namespace Tests\Feature\Traits;
+
 use Illuminate\Support\Facades\Config;
 use Mockery;
 use Tests\Assets\Traits\AuthTestHelpers;
@@ -27,7 +28,7 @@ class TokenValidationTest extends TestCase
 
         $me->assertStatus(403)
             ->assertJson([
-                'message' => 'The token is expired'
+                'message' => 'The token is expired',
             ]);
 
         $this->assertDatabaseHas('jwt_token_blacklist', [
@@ -43,7 +44,7 @@ class TokenValidationTest extends TestCase
         $token = $registered->json('new_tokens.0');
 
         $this->me($token['token'])->assertStatus(403)->assertJson([
-            'message' => 'The token is expired'
+            'message' => 'The token is expired',
         ]);
 
         $this->assertDatabaseHas('jwt_token_blacklist', [
@@ -51,7 +52,7 @@ class TokenValidationTest extends TestCase
         ]);
 
         $this->me($token['token'])->assertStatus(403)->assertJson([
-            'message' => 'The token is revoked'
+            'message' => 'The token is revoked',
         ]);
     }
 }

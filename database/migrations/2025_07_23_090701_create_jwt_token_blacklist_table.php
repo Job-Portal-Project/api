@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('jwt_token_blacklist', function (Blueprint $table) {
-		$table->id();
-            	$table->uuid('jwt_token_id');
-            	$table->timestamps();
+            $table->id();
+            $table->uuid('jwt_token_id');
+            $table->timestamps();
 
-            	$table->foreign('jwt_token_id')->references('id')->on('jwt_tokens');
+            $table->foreign('jwt_token_id')->references('id')->on('jwt_tokens');
         });
     }
 

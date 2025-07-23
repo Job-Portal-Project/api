@@ -19,9 +19,6 @@ class TokenGuard
     /**
      * Handle the incoming request and authenticate the user based on JWT token.
      *
-     * @param  Request  $request
-     * @param  UserProvider  $provider
-     * @return Authenticatable|null
      *
      * @throws AuthenticationException
      * @throws AuthorizationException

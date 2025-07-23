@@ -12,6 +12,6 @@ class TokenBlacklist extends Model
     protected $table = 'jwt_token_blacklist';
 
     protected $fillable = [
-        'jwt_token_id'
+        'jwt_token_id',
     ];
 }

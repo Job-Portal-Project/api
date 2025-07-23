@@ -25,8 +25,6 @@ class GenerateJwtKeys extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle(): int
     {
@@ -53,7 +51,7 @@ class GenerateJwtKeys extends Command
      */
     private function createJwtStorageDirectory(): void
     {
-        if (!File::exists(storage_path('jwt'))) {
+        if (! File::exists(storage_path('jwt'))) {
             File::makeDirectory(storage_path('jwt'), 0755, true);
             $this->info('Created storage/jwt directory.');
         }
@@ -69,12 +67,12 @@ class GenerateJwtKeys extends Command
             'genpkey',
             '-algorithm', 'RSA',
             '-out', storage_path('jwt/private_key.pem'),
-            '-pkeyopt', 'rsa_keygen_bits:2048'
+            '-pkeyopt', 'rsa_keygen_bits:2048',
         ]);
 
         $process->run();
 
-        if (!$process->isSuccessful()) {
+        if (! $process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
 
@@ -91,12 +89,12 @@ class GenerateJwtKeys extends Command
             'rsa',
             '-pubout',
             '-in', storage_path('jwt/private_key.pem'),
-            '-out', storage_path('jwt/public_key.pem')
+            '-out', storage_path('jwt/public_key.pem'),
         ]);
 
         $process->run();
 
-        if (!$process->isSuccessful()) {
+        if (! $process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }
 
@@ -132,9 +130,6 @@ class GenerateJwtKeys extends Command
 
     /**
      * Update a specific environment variable in the .env file.
-     *
-     * @param string $key
-     * @param string $value
      */
     private function updateEnvVariable(string $key, string $value): void
     {

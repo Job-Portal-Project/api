@@ -55,7 +55,7 @@ class AuthControllerTest extends TestCase
         $refreshToken = $registered->json('new_tokens.1.token');
 
         $this->me($refreshToken)->assertStatus(403)->assertJson([
-            'message' => 'This action is unauthorized.'
+            'message' => 'This action is unauthorized.',
         ]);
     }
 
@@ -65,7 +65,7 @@ class AuthControllerTest extends TestCase
     public function test_me_endpoint_returns_status_401_with_invalid_token(): void
     {
         $this->me('invalid token')->assertStatus(401)->assertJson([
-            'message' => 'Unauthenticated.'
+            'message' => 'Unauthenticated.',
         ]);
     }
 
@@ -80,7 +80,7 @@ class AuthControllerTest extends TestCase
 
         $me->assertStatus(403)
             ->assertJson([
-                'message' => 'The token cannot be used yet'
+                'message' => 'The token cannot be used yet',
             ]);
     }
 
@@ -95,7 +95,7 @@ class AuthControllerTest extends TestCase
 
         $me->assertStatus(403)
             ->assertJson([
-                'message' => 'The token is expired'
+                'message' => 'The token is expired',
             ]);
     }
 
@@ -119,7 +119,7 @@ class AuthControllerTest extends TestCase
 
         $auth->assertStatus(401)
             ->assertJson([
-                'message' => 'Unauthenticated.'
+                'message' => 'Unauthenticated.',
             ]);
     }
 
@@ -145,7 +145,7 @@ class AuthControllerTest extends TestCase
 
         $revoke->assertStatus(401)
             ->assertJson([
-                'message' => 'Unauthenticated.'
+                'message' => 'Unauthenticated.',
             ]);
     }
 
@@ -155,7 +155,7 @@ class AuthControllerTest extends TestCase
 
         $revoke->assertStatus(403)
             ->assertJson([
-                'message' => 'This action is unauthorized.'
+                'message' => 'This action is unauthorized.',
             ]);
     }
 
@@ -164,7 +164,7 @@ class AuthControllerTest extends TestCase
         $registered = $this->registerUser();
 
         $revokeRequest = fn (string $token) => $this->delete(route('auth.revoke'), [], [
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
             'Accept' => 'application/json',
         ]);
 
@@ -177,14 +177,14 @@ class AuthControllerTest extends TestCase
         $refresh = next($revokedTokens);
 
         $revokeRequest($refresh)->assertStatus(403)->assertJson([
-            'message' => 'This action is unauthorized.'
+            'message' => 'This action is unauthorized.',
         ]);
 
         $revokeRequest($access)->assertNoContent()->isEmpty();
 
-        foreach($revokedTokens as $revokedToken) {
+        foreach ($revokedTokens as $revokedToken) {
             $revokeRequest($revokedToken)->assertStatus(403)->assertJson([
-                'message' => ($revokedToken === $refresh) ? 'This action is unauthorized.' : 'The token is revoked'
+                'message' => ($revokedToken === $refresh) ? 'This action is unauthorized.' : 'The token is revoked',
             ]);
         }
     }
@@ -194,14 +194,14 @@ class AuthControllerTest extends TestCase
         $registered = $this->registerUser();
 
         $revoke = $this->delete(route('auth.revoke'), [], [
-            'Authorization' => 'Bearer ' . $registered->json('new_tokens.0.token'),
+            'Authorization' => 'Bearer '.$registered->json('new_tokens.0.token'),
             'Accept' => 'application/json',
         ]);
 
         $revoke->assertNoContent();
 
         collect($registered->json('new_tokens'))->each(function (array $token) {
-            $this->assertDatabaseHas((new TokenBlacklist())->getTable(), [
+            $this->assertDatabaseHas((new TokenBlacklist)->getTable(), [
                 'jwt_token_id' => $token['claims']['jti'],
             ]);
         });
@@ -213,28 +213,28 @@ class AuthControllerTest extends TestCase
             'new_tokens' => [
                 $this->tokenResponseStructure,
                 $this->tokenResponseStructure,
-            ]
+            ],
         ]);
     }
 
     public function test_refresh_endpoint_returns_403_with_invalid_token_type(): void
     {
         $this->refresh('new_tokens.0.token')->assertStatus(403)->assertJson([
-            'message' => 'This action is unauthorized.'
+            'message' => 'This action is unauthorized.',
         ]);
     }
 
     public function test_refresh_endpoint_returns_401_when_provided_invalid_token(): void
     {
         $this->refresh('invalid token')->assertUnauthorized()->assertJson([
-            'message' => 'Unauthenticated.'
+            'message' => 'Unauthenticated.',
         ]);
     }
 
     public function test_refresh_endpoint_returns_valid_tokens_when_provided_valid_token(): void
     {
         $refreshRequest = fn (string $token) => $this->post(route('auth.refresh'), [], [
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
             'Accept' => 'application/json',
         ]);
 
@@ -242,7 +242,7 @@ class AuthControllerTest extends TestCase
             'new_tokens' => [
                 $this->tokenResponseStructure,
                 $this->tokenResponseStructure,
-            ]
+            ],
         ];
 
         $registered = $this->registerUser();

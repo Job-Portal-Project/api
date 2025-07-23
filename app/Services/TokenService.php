@@ -26,7 +26,7 @@ class TokenService implements TokenServiceInterface
         $publicKey = config('jwt.public_key_path');
 
         return Configuration::forAsymmetricSigner(
-            new Sha512(),
+            new Sha512,
             InMemory::file($privateKey),
             InMemory::file($publicKey),
         );
@@ -53,7 +53,7 @@ class TokenService implements TokenServiceInterface
             RegisteredClaims::NOT_BEFORE => 'canOnlyBeUsedAfter',
         ];
 
-        $claims->each(function($value, string $name) use (&$builder, $methods) {
+        $claims->each(function ($value, string $name) use (&$builder, $methods) {
             $builder = array_key_exists($name, $methods)
                 ? $builder->{$methods[$name]}($value)
                 : $builder->withClaim($name, $value);
@@ -95,9 +95,6 @@ class TokenService implements TokenServiceInterface
 
     /**
      * Revoke a token or a collection of tokens.
-     *
-     * @param  Token|Collection  $token
-     * @return void
      */
     public function revoke(Token|Collection $token): void
     {

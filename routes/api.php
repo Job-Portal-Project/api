@@ -1,8 +1,7 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\V1\AuthController;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->middleware('localization')->group(function () {
     Route::prefix('auth')->controller(AuthController::class)->name('auth.')->group(function () {

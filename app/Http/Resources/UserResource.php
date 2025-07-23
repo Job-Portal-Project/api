@@ -15,7 +15,7 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         return array_merge(parent::toArray($request), [
-            'new_tokens' => $this->whenHas('new_tokens', fn () => TokenResource::collection($this->new_tokens))
+            'new_tokens' => $this->whenHas('new_tokens', fn () => TokenResource::collection($this->new_tokens)),
         ]);
     }
 }

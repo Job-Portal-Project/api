@@ -28,7 +28,7 @@ class UserRepositoryTest extends TestCase
 
         $userID = $user->id;
 
-        $this->assertDatabaseHas((new User())->getTable(), [
+        $this->assertDatabaseHas((new User)->getTable(), [
             'id' => $userID,
         ]);
 

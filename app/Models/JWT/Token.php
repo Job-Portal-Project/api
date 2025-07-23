@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Carbon;
-use Psr\Container\{ContainerExceptionInterface, NotFoundExceptionInterface};
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class Token extends Model
 {
@@ -19,18 +20,19 @@ class Token extends Model
     protected $table = 'jwt_tokens';
 
     protected $keyType = 'string';
+
     public $incrementing = false;
 
     protected $fillable = [
         'id',
         'token',
         'tokenable_id',
-        'tokenable_type'
+        'tokenable_type',
     ];
 
     protected $hidden = [
         'tokenable_id',
-        'tokenable_type'
+        'tokenable_type',
     ];
 
     protected $casts = [
@@ -64,7 +66,7 @@ class Token extends Model
     protected function encrypt(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => app()->get(TokenServiceInterface::class)->encrypt(
+            get: fn (mixed $value, array $attributes) => app()->get(TokenServiceInterface::class)->encrypt(
                 $attributes['id'],
                 $attributes['tokenable_id'],
                 Carbon::parse($attributes['created_at']),

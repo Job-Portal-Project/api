@@ -22,7 +22,8 @@ class TokenCast implements CastsAttributes
     /**
      * Cast the given value.
      *
-     * @param array<string, mixed> $attributes
+     * @param  array<string, mixed>  $attributes
+     *
      * @throws JsonException
      */
     public function get(Model $model, string $key, mixed $value, array $attributes): mixed
@@ -49,13 +50,13 @@ class TokenCast implements CastsAttributes
     /**
      * Prepare the given value for storage.
      *
-     * @param array<string, mixed> $attributes
+     * @param  array<string, mixed>  $attributes
+     *
      * @throws JsonException
      */
     public function set(Model $model, string $key, mixed $value, array $attributes): mixed
     {
-        /** @var  UnencryptedToken $value */
-
+        /** @var UnencryptedToken $value */
         $components = [
             'headers' => $value->headers()->all(),
             'claims' => $value->claims()->all(),

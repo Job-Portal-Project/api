@@ -6,9 +6,8 @@ use Kongulov\Traits\InteractWithEnum;
 
 enum TokenType: string
 {
-	use InteractWithEnum;
-	
-	case ACCESS = 'access';
-	case REFRESH = 'refresh';
-}
+    use InteractWithEnum;
 
+    case ACCESS = 'access';
+    case REFRESH = 'refresh';
+}

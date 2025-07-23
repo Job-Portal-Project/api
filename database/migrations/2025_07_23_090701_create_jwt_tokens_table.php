@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('jwt_tokens', function (Blueprint $table) {
-		$table->uuid('id')->primary();
-            	$table->morphs('tokenable');
-            	$table->json('token');
-            	$table->timestamps();
+            $table->uuid('id')->primary();
+            $table->morphs('tokenable');
+            $table->json('token');
+            $table->timestamps();
         });
     }
 

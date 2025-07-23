@@ -24,10 +24,6 @@ class AuthController extends Controller
 
     /**
      * Register a new user.
-     *
-     * @param  Request  $request
-     * @param  UserRepository  $repository
-     * @return JsonResponse
      */
     public function register(Request $request, UserRepository $repository): JsonResponse
     {
@@ -47,14 +43,11 @@ class AuthController extends Controller
     /**
      * Authenticate a user and return a JWT token.
      *
-     * @param  Request  $request
-     * @param  TokenRepository  $repository
-     * @return JsonResponse
      * @throws Throwable
      */
     public function authenticate(Request $request, TokenRepository $repository): JsonResponse
     {
-        list($email, $password) = array_values($request->validate([
+        [$email, $password] = array_values($request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]));
@@ -74,9 +67,6 @@ class AuthController extends Controller
 
     /**
      * Revoke the current JWT token.
-     *
-     * @param  Request  $request
-     * @return JsonResponse
      */
     public function revoke(Request $request): JsonResponse
     {
@@ -89,9 +79,6 @@ class AuthController extends Controller
 
     /**
      * Refresh the JWT token.
-     *
-     * @param  TokenRepository  $repository
-     * @return JsonResponse
      */
     public function refresh(TokenRepository $repository): JsonResponse
     {
@@ -100,7 +87,7 @@ class AuthController extends Controller
         $tokens = $repository->create([$user])->new_tokens;
 
         $response = new JsonResponse([
-            'new_tokens' => TokenResource::collection($tokens)
+            'new_tokens' => TokenResource::collection($tokens),
         ], Response::HTTP_CREATED);
 
         return $response;
@@ -108,8 +95,6 @@ class AuthController extends Controller
 
     /**
      * Get the authenticated user's details.
-     *
-     * @return JsonResponse
      */
     public function me(): JsonResponse
     {
@@ -122,10 +107,6 @@ class AuthController extends Controller
 
     /**
      * Generate a user response with the given resource.
-     *
-     * @param  Authenticatable|null  $record
-     * @param  int  $status
-     * @return JsonResponse
      */
     private function userResponse(?Authenticatable $record, int $status = 200): JsonResponse
     {

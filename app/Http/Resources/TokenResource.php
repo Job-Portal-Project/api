@@ -23,6 +23,7 @@ class TokenResource extends JsonResource
      * Transform the resource into an array.
      *
      * @return array<string, mixed>
+     *
      * @throws Exception
      */
     public function toArray(Request $request): array
@@ -33,7 +34,7 @@ class TokenResource extends JsonResource
         return [
             'headers' => $token->headers()->all(),
             'claims' => $token->claims()->all(),
-            'token' => $token->toString()
+            'token' => $token->toString(),
         ];
     }
 }

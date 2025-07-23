@@ -29,7 +29,7 @@ class TokenRepository extends AbstractRepository
             $tokens = $tokenPayloads->map(fn ($payload) => $this->service->build($payload));
 
             /** @var Collection<array> $tokenData */
-            $tokenData = $tokens->map(function(UnencryptedToken $token) use ($user) {
+            $tokenData = $tokens->map(function (UnencryptedToken $token) use ($user) {
                 return [
                     'id' => $token->claims()->get('jti'),
                     'token' => $token,

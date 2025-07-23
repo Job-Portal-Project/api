@@ -13,9 +13,8 @@ class AccessTokenMiddleware extends TokenAbstractMiddleware
     /**
      * Handle an incoming request.
      *
-     * @param  Request  $request
      * @param  Closure(Request): (Response)  $next
-     * @return Response
+     *
      * @throws Throwable
      */
     public function handle(Request $request, Closure $next): Response

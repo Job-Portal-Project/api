@@ -16,8 +16,7 @@ class UserRepository extends AbstractRepository
 
     public function __construct(
         protected TokenServiceInterface $service
-    )
-    {
+    ) {
         parent::__construct();
     }
 
@@ -30,7 +29,7 @@ class UserRepository extends AbstractRepository
             $tokenPayloads = $this->service->data(sub: $user->id);
 
             /** @var Collection<UnencryptedToken> $tokens */
-            $tokens = $tokenPayloads->map(fn($payload) => $this->service->build($payload));
+            $tokens = $tokenPayloads->map(fn ($payload) => $this->service->build($payload));
 
             /** @var Collection<array> $tokenData */
             $tokenData = $tokens->map(function (UnencryptedToken $token) use ($user) {
@@ -46,7 +45,7 @@ class UserRepository extends AbstractRepository
 
             $user->setAttribute(
                 'new_tokens',
-                $tokenData->map(fn($token) => new Token($token))
+                $tokenData->map(fn ($token) => new Token($token))
             );
 
             return $user;

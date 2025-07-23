@@ -8,9 +8,7 @@ abstract class AbstractRepository
 {
     protected string $model;
 
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     public function create(array $data): Model
     {

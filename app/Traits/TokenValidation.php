@@ -2,8 +2,8 @@
 
 namespace App\Traits;
 
-use App\Models\JWT\Token;
 use App\Contracts\JWT\TokenServiceInterface;
+use App\Models\JWT\Token;
 use Carbon\FactoryImmutable;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Request;
@@ -22,7 +22,9 @@ use Throwable;
 trait TokenValidation
 {
     protected TokenServiceInterface $service;
+
     protected Configuration $config;
+
     protected string $inputKey;
 
     public function __construct(
@@ -36,9 +38,6 @@ trait TokenValidation
 
     /**
      * Get the token for the current request.
-     *
-     * @param  Request  $request
-     * @return UnencryptedToken|null
      */
     private function getTokenForRequest(Request $request): ?UnencryptedToken
     {
@@ -80,12 +79,12 @@ trait TokenValidation
         $constraints = [
             new IdentifiedBy($record->id),
             new RelatedTo($record->tokenable_id),
-            new LooseValidAt(new FactoryImmutable()),
-            new SignedWith(new Sha512(), InMemory::file(config('jwt.public_key_path')))
+            new LooseValidAt(new FactoryImmutable),
+            new SignedWith(new Sha512, InMemory::file(config('jwt.public_key_path'))),
         ];
 
         try {
-            foreach($constraints as $constraint) {
+            foreach ($constraints as $constraint) {
                 $constraint->assert($token);
             }
         } catch (ConstraintViolation $e) {

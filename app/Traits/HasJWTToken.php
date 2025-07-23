@@ -21,5 +21,4 @@ trait HasJWTToken
             set: fn (Collection $value) => $value,
         );
     }
-
 }

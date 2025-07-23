@@ -11,8 +11,11 @@ trait AuthTestHelpers
     use RefreshDatabase, WithFaker;
 
     protected array $userResponseStructure;
+
     protected array $tokenResponseStructure;
+
     protected array $registeredUserResponseStructure;
+
     protected array $authenticatedUserResponseStructure;
 
     public function setUp(): void
@@ -22,7 +25,7 @@ trait AuthTestHelpers
         $this->tokenResponseStructure = [
             'headers' => [
                 'typ',
-                'alg'
+                'alg',
             ],
             'claims' => [
                 'jti',
@@ -30,9 +33,9 @@ trait AuthTestHelpers
                 'typ',
                 'iat',
                 'exp',
-                'nbf'
+                'nbf',
             ],
-            'token'
+            'token',
         ];
 
         $this->userResponseStructure = [
@@ -40,14 +43,14 @@ trait AuthTestHelpers
             'name',
             'email',
             'updated_at',
-            'created_at'
+            'created_at',
         ];
 
         $this->registeredUserResponseStructure = array_merge($this->userResponseStructure, [
             'new_tokens' => [
                 $this->tokenResponseStructure,
-                $this->tokenResponseStructure
-            ]
+                $this->tokenResponseStructure,
+            ],
         ]);
 
         $this->authenticatedUserResponseStructure = $this->registeredUserResponseStructure;
@@ -62,7 +65,7 @@ trait AuthTestHelpers
             'name' => $this->faker->name,
             'email' => $this->faker->unique()->safeEmail,
             'password' => 'password',
-            'passwordConfirm' => 'password'
+            'passwordConfirm' => 'password',
         ], $overrides);
 
         if (isset($overrides['password'])) {
@@ -84,7 +87,7 @@ trait AuthTestHelpers
         $token = $token ?? $user->json('new_tokens.0.token');
 
         return $this->get(route('auth.me'), [
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
             'Accept' => 'application/json',
         ]);
     }
@@ -106,7 +109,7 @@ trait AuthTestHelpers
 
         return $this->delete(route('auth.revoke'), [], [
             'Accept' => 'application/json',
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ]);
     }
 
@@ -118,7 +121,7 @@ trait AuthTestHelpers
 
         return $this->post(route('auth.refresh'), [], [
             'Accept' => 'application/json',
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ]);
     }
 }
