@@ -29,8 +29,9 @@ trait TokenValidation
 
     public function __construct(
         ?TokenServiceInterface $service = null,
-        string $inputKey = 'token',
-    ) {
+        string                 $inputKey = 'token',
+    )
+    {
         $this->service = $service ?? app()->get(TokenServiceInterface::class);
         $this->config = $this->service->config();
         $this->inputKey = $inputKey;
@@ -57,13 +58,14 @@ trait TokenValidation
 
         if ($token) {
             try {
-                $token = $this->config->parser()->parse($token);
+                $parsedToken = $this->config->parser()->parse($token);
+                return $parsedToken instanceof UnencryptedToken ? $parsedToken : null;
             } catch (Exception) {
-                $token = null;
+                return null;
             }
         }
 
-        return $token;
+        return null;
     }
 
     private function isRevoked(Token $token): bool
@@ -78,7 +80,7 @@ trait TokenValidation
     {
         $constraints = [
             new IdentifiedBy($record->id),
-            new RelatedTo($record->tokenable_id),
+            new RelatedTo((string) $record->tokenable_id),
             new LooseValidAt(new FactoryImmutable),
             new SignedWith(new Sha512, InMemory::file(config('jwt.public_key_path'))),
         ];

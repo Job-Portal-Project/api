@@ -37,7 +37,7 @@ abstract class TokenAbstractMiddleware
         $token = $this->getTokenForRequest($request);
 
         throw_if(
-            ! $record = Token::query()->where('id', $token?->claims()->get('jti'))->first(),
+            ! $token || ! $record = Token::query()->where('id', $token->claims()->get('jti'))->first(),
             AuthenticationException::class
         );
 

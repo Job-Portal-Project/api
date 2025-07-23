@@ -27,7 +27,8 @@ class TokenGuard
     public function __invoke(Request $request, UserProvider $provider): ?Authenticatable
     {
         // Retrieve and validate the JWT from the request
-        throw_if(! $token = $this->getTokenForRequest($request), AuthenticationException::class);
+        $token = $this->getTokenForRequest($request);
+        throw_if(! $token, AuthenticationException::class);
 
         // Retrieve the user based on the token's "sub" (subject) claim
         throw_if(! $tokenable = $provider->retrieveById($token->claims()->get('sub')), AuthenticationException::class);

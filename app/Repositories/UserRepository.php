@@ -26,7 +26,7 @@ class UserRepository extends AbstractRepository
             /** @var User $user */
             $user = parent::create($data);
 
-            $tokenPayloads = $this->service->data(sub: $user->id);
+            $tokenPayloads = $this->service->data(sub: ((string) $user->getAuthIdentifier()));
 
             /** @var Collection<UnencryptedToken> $tokens */
             $tokens = $tokenPayloads->map(fn ($payload) => $this->service->build($payload));
