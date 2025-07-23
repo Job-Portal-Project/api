@@ -23,4 +23,4 @@ Visit the interactive documentation at: `https://Job-Portal-Project.github.io/ap
 
 ## Deployment
 
-This documentation is automatically deployed via GitHub Actions when `storage/api-docs/api-docs.json` is updated.
+This documentation is automatically deployed via GitHub Actions when `storage/api-docs/api-docs.json` is updated.# Force GitHub Pages rebuild - Wed Jul 23 06:44:15 PM +04 2025
