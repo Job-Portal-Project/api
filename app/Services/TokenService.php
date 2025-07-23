@@ -105,4 +105,20 @@ class TokenService implements TokenServiceInterface
 
         TokenBlacklist::insert($collection->toArray());
     }
+
+    /**
+     * Encrypt token data for storage.
+     */
+    public function encrypt(string $id, string $tokenableId, \Carbon\Carbon $createdAt, \Carbon\Carbon $expiresAt, \Carbon\Carbon $canBeUsedAfter): UnencryptedToken
+    {
+        $claims = collect([
+            RegisteredClaims::ID => $id,
+            RegisteredClaims::SUBJECT => $tokenableId,
+            RegisteredClaims::ISSUED_AT => $createdAt->toDateTimeImmutable(),
+            RegisteredClaims::EXPIRATION_TIME => $expiresAt->toDateTimeImmutable(),
+            RegisteredClaims::NOT_BEFORE => $canBeUsedAfter->toDateTimeImmutable(),
+        ]);
+
+        return $this->build($claims);
+    }
 }

@@ -28,4 +28,9 @@ interface TokenServiceInterface
      * Build and return the signed JWT.
      */
     public function build(Collection $claims): UnencryptedToken;
+
+    /**
+     * Encrypt token data for storage.
+     */
+    public function encrypt(string $id, string $tokenableId, \Carbon\Carbon $createdAt, \Carbon\Carbon $expiresAt, \Carbon\Carbon $canBeUsedAfter): UnencryptedToken;
 }
