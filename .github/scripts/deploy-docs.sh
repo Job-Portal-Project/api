@@ -57,6 +57,13 @@ cp storage/api-docs/api-docs.json $DOCS_DIR/
 echo "📥 Downloading Swagger UI..."
 curl -sL https://github.com/swagger-api/swagger-ui/archive/refs/tags/v5.27.0.tar.gz | tar -xz
 cp -r swagger-ui-5.27.0/dist/* $DOCS_DIR/swagger-ui/
+# Ensure correct CSS filenames for GitHub Pages
+if [ -f "$DOCS_DIR/swagger-ui/swagger-ui-bundle.css" ]; then
+    cp "$DOCS_DIR/swagger-ui/swagger-ui-bundle.css" "$DOCS_DIR/swagger-ui/swagger-ui.css"
+fi
+if [ -f "$DOCS_DIR/swagger-ui/swagger-ui-standalone-preset.css" ]; then
+    cp "$DOCS_DIR/swagger-ui/swagger-ui-standalone-preset.css" "$DOCS_DIR/swagger-ui/swagger-ui-standalone.css"
+fi
 rm -rf swagger-ui-5.27.0
 
 echo "🌐 Creating HTML files..."
@@ -68,8 +75,8 @@ cat > $DOCS_DIR/index.html << 'EOF'
 <head>
   <meta charset="UTF-8">
   <title>Job Portal API Documentation</title>
-  <link rel="stylesheet" type="text/css" href="swagger-ui/swagger-ui-bundle.css" />
-  <link rel="stylesheet" type="text/css" href="swagger-ui/swagger-ui-standalone-preset.css" />
+  <link rel="stylesheet" type="text/css" href="swagger-ui/swagger-ui.css" />
+  <link rel="stylesheet" type="text/css" href="swagger-ui/swagger-ui-standalone.css" />
   <style>
     html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
     *, *:before, *:after { box-sizing: inherit; }
@@ -224,7 +231,14 @@ rm -rf * 2>/dev/null || true
 
 # Copy docs to root
 echo "📁 Copying documentation files..."
-cp -r $DOCS_DIR/* .
+if [ -d "$DOCS_DIR" ] && [ "$(ls -A $DOCS_DIR)" ]; then
+    cp -r $DOCS_DIR/* .
+else
+    echo "❌ Error: Documentation directory is empty or missing"
+    echo "📍 Expected directory: $DOCS_DIR"
+    ls -la temp-docs* 2>/dev/null || echo "No temp-docs directories found"
+    exit 1
+fi
 
 # Add and commit
 echo "💾 Committing documentation..."
