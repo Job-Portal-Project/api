@@ -9,8 +9,7 @@ use Closure;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
+use Psr\Container\{ContainerExceptionInterface,NotFoundExceptionInterface};
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -38,7 +37,7 @@ abstract class TokenAbstractMiddleware
         $token = $this->getTokenForRequest($request);
 
         throw_if(
-            !$record = Token::where('id', $token?->claims()->get('jti'))->first(),
+            !$record = Token::query()->where('id', $token?->claims()->get('jti'))->first(),
             AuthenticationException::class
         );
 
@@ -47,6 +46,6 @@ abstract class TokenAbstractMiddleware
             AuthorizationException::class
         );
 
-        $this->validate($token, $record);
+        $this->confirm($token, $record);
     }
 }
