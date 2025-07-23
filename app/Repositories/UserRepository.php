@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Contracts\JWT\TokenServiceInterface;
+use App\Models\JWT\Token;
 use App\Models\User;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Collection;
@@ -29,10 +30,10 @@ class UserRepository extends AbstractRepository
             $tokenPayloads = $this->service->data(sub: $user->id);
 
             /** @var Collection<UnencryptedToken> $tokens */
-            $tokens = $tokenPayloads->map(fn ($payload) => $this->service->build($payload));
+            $tokens = $tokenPayloads->map(fn($payload) => $this->service->build($payload));
 
             /** @var Collection<array> $tokenData */
-            $tokenData = $tokens->map(function(UnencryptedToken $token) use ($user) {
+            $tokenData = $tokens->map(function (UnencryptedToken $token) use ($user) {
                 return [
                     'id' => $token->claims()->get('jti'),
                     'token' => $token,
@@ -45,7 +46,7 @@ class UserRepository extends AbstractRepository
 
             $user->setAttribute(
                 'new_tokens',
-                $tokenData->map(fn ($token) => new Token($token))
+                $tokenData->map(fn($token) => new Token($token))
             );
 
             return $user;
