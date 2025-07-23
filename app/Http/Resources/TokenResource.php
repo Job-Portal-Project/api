@@ -29,7 +29,7 @@ class TokenResource extends JsonResource
     public function toArray(Request $request): array
     {
         /** @var UnencryptedToken $token */
-        $token = $this->token;
+        $token = $this->resource->token;
 
         return [
             'headers' => $token->headers()->all(),

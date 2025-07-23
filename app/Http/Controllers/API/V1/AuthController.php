@@ -72,7 +72,9 @@ class AuthController extends Controller
     {
         $token = $this->getTokenForRequest($request);
 
-        $this->service->revoke(Token::whereJsonContains('token->claims->grp', $token->claims()->get('grp'))->get());
+        if ($token) {
+            $this->service->revoke(Token::whereJsonContains('token->claims->grp', $token->claims()->get('grp'))->get());
+        }
 
         return response()->json([], Response::HTTP_NO_CONTENT);
     }
@@ -82,9 +84,13 @@ class AuthController extends Controller
      */
     public function refresh(TokenRepository $repository): JsonResponse
     {
+        /** @var \Illuminate\Foundation\Auth\User $user */
         $user = auth('api')->user();
 
-        $tokens = $repository->create([$user])->new_tokens;
+        $userWithTokens = $repository->create([$user]);
+        
+        /** @var \Illuminate\Support\Collection $tokens */
+        $tokens = $userWithTokens->getAttribute('new_tokens');
 
         $response = new JsonResponse([
             'new_tokens' => TokenResource::collection($tokens),
