@@ -1,0 +1,26 @@
+<?php
+
+namespace App\Http\Middleware\JWT;
+
+use App\Enums\JWT\TokenType;
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Throwable;
+
+class AccessTokenMiddleware extends TokenAbstractMiddleware
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  Closure(Request): (Response)  $next
+     *
+     * @throws Throwable
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        $this->start($request, TokenType::ACCESS);
+
+        return $next($request);
+    }
+}

@@ -86,6 +86,9 @@ jobs:
       - name: Run database migrations
         run: php artisan migrate --force
 
+      - name: Generate keys
+        run: APP_ENV=testing php artisan jwt:generate-keys
+
       - name: Run tests
         run: vendor/bin/phpunit --coverage-clover coverage.xml
 
@@ -93,7 +96,7 @@ jobs:
         if: matrix.php-version == '8.2'
         uses: codecov/codecov-action@v5
         with:
-          file: ./coverage.xml
+          files: ./coverage.xml
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: Job-Portal-Project/api
