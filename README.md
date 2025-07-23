@@ -14,12 +14,12 @@ This directory contains the OpenAPI 3.0 specification for the Job Portal API.
 ### For Frontend Development
 ```javascript
 // Fetch the OpenAPI specification
-const apiSpec = await fetch('https://job-portal-project.github.io/jobportal/api-docs.json');
+const apiSpec = await fetch('https://Job-Portal-Project.github.io/api/api-docs.json');
 const spec = await apiSpec.json();
 ```
 
 ### For API Testing
-Visit the interactive documentation at: `https://your-username.github.io/jobportal/`
+Visit the interactive documentation at: `https://Job-Portal-Project.github.io/api/`
 
 ## Deployment
 
