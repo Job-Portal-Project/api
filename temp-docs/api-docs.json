@@ -1,0 +1,516 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Job Portal API",
+        "description": "A comprehensive job portal API with RSA-512 signed JWT authentication. The system uses separate access and refresh tokens stored in a database with automatic revocation and blacklisting capabilities.",
+        "contact": {
+            "name": "Job Portal API Support",
+            "url": "https://example.com/support",
+            "email": "support@example.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api/v1",
+            "description": "Job Portal API Server - All endpoints are prefixed with /api/v1"
+        }
+    ],
+    "paths": {
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Register a new user",
+                "description": "Create a new user account in the job portal system. Returns user data with both access and refresh JWT tokens for immediate use.",
+                "operationId": "157cc8a168a7e9674fcce1d5cb758b2f",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "Preferred language for response messages (e.g., en, es, fr)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "en"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "User registration data",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "passwordConfirm"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "description": "User full name",
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "minLength": 1,
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "description": "Valid email address (must be unique)",
+                                        "type": "string",
+                                        "format": "email",
+                                        "maxLength": 255,
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "description": "Password with minimum 8 characters",
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 8,
+                                        "example": "SecurePass123!"
+                                    },
+                                    "passwordConfirm": {
+                                        "description": "Password confirmation (must match password)",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "SecurePass123!"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "User successfully registered with JWT tokens",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error - Invalid or missing required fields",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/authenticate": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Authenticate user",
+                "description": "Authenticate a user with email and password. Returns user data with both access and refresh JWT tokens. Tokens are RSA-512 signed and stored in the database for security tracking.",
+                "operationId": "94f76d67623cf4af340a84fc73d94c88",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "Preferred language for response messages",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "en"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "User login credentials",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "description": "Registered user email address",
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "description": "User password",
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "SecurePass123!"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Authentication successful with JWT tokens",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Authentication failed - Invalid credentials",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error - Invalid or missing email/password",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/revoke": {
+            "delete": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Revoke user tokens",
+                "description": "Revoke the current JWT token and all tokens in the same session group. This effectively logs out the user from all devices. Requires a valid access token.",
+                "operationId": "5d764efce2e475c6aefd8a1751805b2f",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "Preferred language for response messages",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "en"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Tokens successfully revoked - User logged out from all devices"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid, expired, or missing access token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Refresh JWT tokens",
+                "description": "Generate new access and refresh JWT tokens using a valid refresh token. The old tokens are automatically revoked. This endpoint requires a refresh token, not an access token.",
+                "operationId": "e4dd00c1f320e0642443ccd7c5e2b39e",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "Preferred language for response messages",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "en"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "New tokens successfully generated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "new_tokens": {
+                                            "description": "Array containing new access and refresh tokens",
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Token"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid, expired, revoked, or missing refresh token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "refreshAuth": []
+                    }
+                ]
+            }
+        },
+        "/auth/me": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Get authenticated user profile",
+                "description": "Retrieve the authenticated user's profile information using a valid access token. Returns user data without tokens.",
+                "operationId": "9c0012129fcf8faadda5ee3f7eabcc6e",
+                "parameters": [
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "Preferred language for response messages",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "en"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User profile retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid, expired, revoked, or missing access token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthenticationError"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ValidationError": {
+                "title": "Validation Error Response",
+                "description": "Standard Laravel validation error response",
+                "properties": {
+                    "message": {
+                        "description": "Human readable error message",
+                        "type": "string",
+                        "example": "The given data was invalid."
+                    },
+                    "errors": {
+                        "description": "Field-specific validation errors",
+                        "type": "object",
+                        "example": {
+                            "email": [
+                                "The email field is required.",
+                                "The email must be a valid email address."
+                            ],
+                            "password": [
+                                "The password must be at least 8 characters."
+                            ]
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "AuthenticationError": {
+                "title": "Authentication Error Response",
+                "description": "Authentication failure response",
+                "properties": {
+                    "message": {
+                        "description": "Authentication error message",
+                        "type": "string",
+                        "example": "Unauthenticated."
+                    }
+                },
+                "type": "object"
+            },
+            "Token": {
+                "title": "JWT Token",
+                "description": "RSA-512 signed JWT token with database backing",
+                "required": [
+                    "headers",
+                    "claims",
+                    "token"
+                ],
+                "properties": {
+                    "headers": {
+                        "description": "JWT token headers with RSA-512 signature algorithm",
+                        "type": "object",
+                        "example": {
+                            "typ": "JWT",
+                            "alg": "RS512"
+                        }
+                    },
+                    "claims": {
+                        "description": "JWT token claims with user and token metadata",
+                        "type": "object",
+                        "example": {
+                            "iss": "job-portal-api",
+                            "sub": "1",
+                            "aud": "job-portal-client",
+                            "exp": 1737633000,
+                            "nbf": 1737547200,
+                            "iat": 1737547200,
+                            "jti": "01936b2e-4c3e-7234-9876-0123456789ab",
+                            "typ": "access",
+                            "grp": "auth_session_123"
+                        }
+                    },
+                    "token": {
+                        "description": "The complete JWT token string (RSA-512 signed)",
+                        "type": "string",
+                        "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJpc3MiOiJqb2ItcG9ydGFsLWFwaSIsInN1YiI6IjEiLCJhdWQiOiJqb2ItcG9ydGFsLWNsaWVudCIsImV4cCI6MTczNzYzMzAwMCwibmJmIjoxNzM3NTQ3MjAwLCJpYXQiOjE3Mzc1NDcyMDAsImp0aSI6IjAxOTM2YjJlLTRjM2UtNzIzNC05ODc2LTAxMjM0NTY3ODlhYiIsInR5cCI6ImFjY2VzcyIsImdycCI6ImF1dGhfc2Vzc2lvbl8xMjMifQ.signature..."
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "title": "User",
+                "description": "User model with JWT token support",
+                "required": [
+                    "id",
+                    "name",
+                    "email",
+                    "created_at",
+                    "updated_at"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "Unique user identifier",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "User full name",
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "description": "User email address (unique)",
+                        "type": "string",
+                        "format": "email",
+                        "example": "john@example.com"
+                    },
+                    "email_verified_at": {
+                        "description": "Email verification timestamp (null if not verified)",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15T09:30:00.000000Z",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "description": "User creation timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15T09:30:00.000000Z"
+                    },
+                    "updated_at": {
+                        "description": "User last update timestamp",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15T09:30:00.000000Z"
+                    },
+                    "new_tokens": {
+                        "description": "Array of newly generated JWT tokens (access and refresh). Only present immediately after authentication/registration/refresh operations.",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Token"
+                        },
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "Enter JWT Bearer token"
+            },
+            "refreshAuth": {
+                "type": "http",
+                "description": "JWT Refresh Token - Use the refresh token to get new access tokens. Format: Bearer {refresh_jwt_token}",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "User authentication and registration endpoints with RSA-512 signed JWT tokens. Supports both access and refresh tokens with database storage and automatic revocation."
+        }
+    ]
+}
