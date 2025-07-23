@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "Job Portal API",
-        "description": "A comprehensive job portal API with RSA-512 signed JWT authentication. The system uses separate access and refresh tokens stored in a database with automatic revocation and blacklisting capabilities. Documentation updated July 2025.",
+        "description": "A comprehensive job portal API with RSA-512 signed JWT authentication. The system uses separate access and refresh tokens stored in a database with automatic revocation and blacklisting capabilities.",
         "contact": {
             "name": "Job Portal API Support",
             "url": "https://example.com/support",
