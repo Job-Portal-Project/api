@@ -101,10 +101,12 @@ class AuthControllerTest extends TestCase
 
     public function test_authenticate_endpoint_returns_status_200_when_provided_valid_credentials(): void
     {
-        $auth = $this->authenticate([
+        $credentials = [
             'email' => $this->faker->safeEmail,
-            'password' => $this->faker->password,
-        ]);
+            'password' => 'password', // Use a fixed password to ensure consistency
+        ];
+
+        $auth = $this->authenticate($credentials);
 
         $auth->assertStatus(200)
             ->assertJsonStructure($this->authenticatedUserResponseStructure);
