@@ -6,9 +6,18 @@
   <link rel="stylesheet" type="text/css" href="swagger-ui/swagger-ui.css" />
   <link rel="stylesheet" type="text/css" href="swagger-ui/index.css" />
   <style>
-    html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
-    *, *:before, *:after { box-sizing: inherit; }
-    body { margin:0; background: #fafafa; }
+    html {
+      box-sizing: border-box;
+      overflow: -moz-scrollbars-vertical;
+      overflow-y: scroll;
+    }
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+    body {
+      margin:0;
+      background: #fafafa;
+    }
     .swagger-ui .topbar { display: none; }
     .swagger-ui .info { margin: 20px 0; }
     .swagger-ui .info .title { color: #3b4151; }
@@ -24,8 +33,13 @@
         url: './api-docs.json',
         dom_id: '#swagger-ui',
         deepLinking: true,
-        presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
-        plugins: [SwaggerUIBundle.plugins.DownloadUrl],
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
         layout: "StandaloneLayout",
         validatorUrl: null,
         tryItOutEnabled: true,
