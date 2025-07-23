@@ -47,7 +47,7 @@ if [ ! -f "storage/api-docs/api-docs.json" ]; then
 fi
 
 # Create temporary docs directory
-DOCS_DIR="temp-docs-$(date +%s)"
+DOCS_DIR="/tmp/temp-docs-$(date +%s)"
 rm -rf $DOCS_DIR
 mkdir -p $DOCS_DIR/swagger-ui
 
@@ -215,6 +215,9 @@ EOF
 # Deploy to gh-pages branch
 echo "📤 Deploying to gh-pages branch..."
 
+# Store the docs directory path before branch switch
+DOCS_TO_DEPLOY="$DOCS_DIR"
+
 # Create or switch to gh-pages branch with error handling
 if git show-ref --verify --quiet refs/heads/gh-pages; then
     echo "📍 Switching to existing gh-pages branch..."
@@ -231,11 +234,11 @@ rm -rf * 2>/dev/null || true
 
 # Copy docs to root
 echo "📁 Copying documentation files..."
-if [ -d "$DOCS_DIR" ] && [ "$(ls -A $DOCS_DIR)" ]; then
-    cp -r $DOCS_DIR/* .
+if [ -d "$DOCS_TO_DEPLOY" ] && [ "$(ls -A $DOCS_TO_DEPLOY)" ]; then
+    cp -r $DOCS_TO_DEPLOY/* .
 else
     echo "❌ Error: Documentation directory is empty or missing"
-    echo "📍 Expected directory: $DOCS_DIR"
+    echo "📍 Expected directory: $DOCS_TO_DEPLOY"
     ls -la temp-docs* 2>/dev/null || echo "No temp-docs directories found"
     exit 1
 fi
