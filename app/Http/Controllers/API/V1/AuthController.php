@@ -88,7 +88,7 @@ class AuthController extends Controller
         $user = auth('api')->user();
 
         $userWithTokens = $repository->create([$user]);
-        
+
         /** @var \Illuminate\Support\Collection $tokens */
         $tokens = $userWithTokens->getAttribute('new_tokens');
 

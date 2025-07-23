@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Services;
+namespace Tests\Unit\Unit\Services;
 
 use App\Services\TokenService;
 use Illuminate\Support\Collection;

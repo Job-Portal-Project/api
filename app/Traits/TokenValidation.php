@@ -29,9 +29,8 @@ trait TokenValidation
 
     public function __construct(
         ?TokenServiceInterface $service = null,
-        string                 $inputKey = 'token',
-    )
-    {
+        string $inputKey = 'token',
+    ) {
         $this->service = $service ?? app()->get(TokenServiceInterface::class);
         $this->config = $this->service->config();
         $this->inputKey = $inputKey;
@@ -59,6 +58,7 @@ trait TokenValidation
         if ($token) {
             try {
                 $parsedToken = $this->config->parser()->parse($token);
+
                 return $parsedToken instanceof UnencryptedToken ? $parsedToken : null;
             } catch (Exception) {
                 return null;
