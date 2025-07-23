@@ -2,11 +2,13 @@
 
 namespace App\Casts;
 
+use App\Contracts\JWT\TokenServiceInterface;
 use Carbon\Carbon;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 use JsonException;
 use Lcobucci\JWT\Token\RegisteredClaims;
+use Lcobucci\JWT\UnencryptedToken;
 
 class TokenCast implements CastsAttributes
 {
@@ -47,10 +49,21 @@ class TokenCast implements CastsAttributes
     /**
      * Prepare the given value for storage.
      *
-     * @param  array<string, mixed>  $attributes
+     * @param array<string, mixed> $attributes
+     * @throws JsonException
      */
     public function set(Model $model, string $key, mixed $value, array $attributes): mixed
     {
-        return $value;
+        /** @var  UnencryptedToken $value */
+
+        $components = [
+            'headers' => $value->headers()->all(),
+            'claims' => $value->claims()->all(),
+        ];
+
+        return json_encode(
+            $components,
+            JSON_THROW_ON_ERROR
+        );
     }
 }
