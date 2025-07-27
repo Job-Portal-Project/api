@@ -10,7 +10,7 @@ class ModelInfo extends Model
 {
     protected $fillable = [
         'name',
-        'alias'
+        'alias',
     ];
 
     public function permissions(): BelongsToMany

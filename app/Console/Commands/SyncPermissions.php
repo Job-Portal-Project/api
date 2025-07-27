@@ -21,27 +21,27 @@ class SyncPermissions extends Command
         'update',
         'index',
         'view',
-        'delete'
+        'delete',
     ];
 
     private array $exceptedTables = [
-        "password_reset_tokens",
-        "failed_jobs",
-        "password_access_tokens",
-        "migrations",
-        "job_batches",
-        "cache_locks",
-        "jobs",
-        "sessions",
-        "cache",
-        "jwt_tokens",
-        "jwt_token_blacklist",
-        "personal_access_tokens",
-        "model_has_permissions",
-        "role_has_permissions",
-        "model_has_roles",
-        "model_info_permission",
-        "model_infos"
+        'password_reset_tokens',
+        'failed_jobs',
+        'password_access_tokens',
+        'migrations',
+        'job_batches',
+        'cache_locks',
+        'jobs',
+        'sessions',
+        'cache',
+        'jwt_tokens',
+        'jwt_token_blacklist',
+        'personal_access_tokens',
+        'model_has_permissions',
+        'role_has_permissions',
+        'model_has_roles',
+        'model_info_permission',
+        'model_infos',
     ];
 
     /**
@@ -56,18 +56,18 @@ class SyncPermissions extends Command
      */
     public function handle()
     {
-        $this->components->info("Syncing permissions.");
+        $this->components->info('Syncing permissions.');
         Artisan::call('permission:cache-reset');
         $this->call('app:reset-permissions');
 
         DB::transaction(function () {
-            foreach($this->tables() as $table) {
-                foreach($this->permissions as $permission) {
+            foreach ($this->tables() as $table) {
+                foreach ($this->permissions as $permission) {
                     $this->components->task(
                         $permissionName = "$permission $table",
                         fn () => Permission::query()->create([
                             'name' => $permissionName,
-                            'guard_name' => 'api'
+                            'guard_name' => 'api',
                         ])
                     );
                 }
@@ -86,9 +86,8 @@ class SyncPermissions extends Command
                 ->pluck('table_name')
                 ->toArray(),
 
-            fn (string $tableName) =>
-                ! in_array($tableName, $this->exceptedTables)
-                && !str_ends_with($tableName, '_translations')
+            fn (string $tableName) => ! in_array($tableName, $this->exceptedTables)
+                && ! str_ends_with($tableName, '_translations')
         );
     }
 }

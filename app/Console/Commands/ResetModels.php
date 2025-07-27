@@ -27,7 +27,7 @@ class ResetModels extends Command
      */
     public function handle()
     {
-        $this->components->info("Resetting models.");
+        $this->components->info('Resetting models.');
 
         DB::statement('SET session_replication_role = replica;');
         ModelInfo::query()->truncate();
