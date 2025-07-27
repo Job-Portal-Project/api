@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\ModelInfo;
 use Illuminate\Console\Command;
-use Illuminate\Console\View\TaskResult;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 

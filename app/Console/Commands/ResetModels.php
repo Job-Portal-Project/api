@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Models\ModelInfo;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Permission;
 
 class ResetModels extends Command
 {
