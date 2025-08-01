@@ -3,8 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Industry extends Model
 {
-    //
+    protected $fillable = [
+        'name',
+    ];
+
+    public function occupations(): HasMany
+    {
+        return $this->hasMany(Occupation::class);
+    }
 }
