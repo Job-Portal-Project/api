@@ -119,8 +119,8 @@ class GenerateJwtKeys extends Command
      */
     private function updateEnvFile(): void
     {
-        $privateKeyPath = realpath(storage_path('jwt/private_key.pem'));
-        $publicKeyPath = realpath(storage_path('jwt/public_key.pem'));
+        $privateKeyPath = storage_path('jwt/private_key.pem');
+        $publicKeyPath = storage_path('jwt/public_key.pem');
 
         $this->updateEnvVariable('JWT_PRIVATE_KEY', $privateKeyPath);
         $this->updateEnvVariable('JWT_PUBLIC_KEY', $publicKeyPath);
