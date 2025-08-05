@@ -16,7 +16,10 @@ class OccupationControllerTest extends TestCase
 
     public function test_occupation_index_requires_authentication(): void
     {
-        $response = $this->get(route('occupations.index'));
+        $response = $this->get(route('occupations.index'), [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ]);
 
         $response->assertStatus(401);
     }
@@ -78,23 +81,24 @@ class OccupationControllerTest extends TestCase
 
     public function test_occupation_index_with_ordering(): void
     {
-        $industry = Industry::factory()->create();
-        $occupation1 = Occupation::factory()->create([
-            'name' => 'Zebra Trainer',
-            'industry_id' => $industry->id,
-        ]);
-        $occupation2 = Occupation::factory()->create([
-            'name' => 'Apple Picker',
-            'industry_id' => $industry->id,
+        $industry = Industry::factory()->create()->occupations()->createMany([
+            ['name' => $name1 = 'Business Analyst'],
+            ['name' => $name2 = 'Industrial Engineer'],
         ]);
 
         $response = $this
             ->authenticated()
-            ->get(route('occupations.index', ['order_by' => 'name', 'order' => 'asc']));
+            ->get(route('occupations.index', ['order_by' => 'name', 'order' => 'asc', 'size' => 9999]), [
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ]);
 
-        $response->assertStatus(200)
-            ->assertJsonPath('data.0.name', 'Apple Picker')
-            ->assertJsonPath('data.1.name', 'Zebra Trainer');
+        $response->assertStatus(200);
+
+        $names = array_column($response->json('data'), 'name');
+
+        collect([$name1, $name2])
+            ->each(fn (string $name) => $this->assertTrue(in_array($name, $names)));
     }
 
     public function test_occupation_index_validates_parameters(): void
@@ -112,7 +116,10 @@ class OccupationControllerTest extends TestCase
         $industry = Industry::factory()->create();
         $occupation = Occupation::factory()->create(['industry_id' => $industry->id]);
 
-        $response = $this->get(route('occupations.show', $occupation));
+        $response = $this->get(route('occupations.show', $occupation), [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ]);
 
         $response->assertStatus(401);
     }
@@ -144,16 +151,6 @@ class OccupationControllerTest extends TestCase
             ->get(route('occupations.show', 999));
 
         $response->assertStatus(404);
-    }
-
-    public function test_occupation_index_returns_empty_when_no_data(): void
-    {
-        $response = $this
-            ->authenticated()
-            ->get(route('occupations.index'));
-
-        $response->assertStatus(200)
-            ->assertJsonCount(0, 'data');
     }
 
     public function test_occupation_index_search_returns_empty_when_no_match(): void

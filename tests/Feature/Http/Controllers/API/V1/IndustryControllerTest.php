@@ -16,7 +16,10 @@ class IndustryControllerTest extends TestCase
 
     public function test_industry_index_requires_authentication(): void
     {
-        $response = $this->get(route('industries.index'));
+        $response = $this->get(route('industries.index'), [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ]);
 
         $response->assertStatus(401);
     }
@@ -86,7 +89,10 @@ class IndustryControllerTest extends TestCase
     {
         $industry = Industry::factory()->create();
 
-        $response = $this->get(route('industries.show', $industry));
+        $response = $this->get(route('industries.show', $industry), [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ]);
 
         $response->assertStatus(401);
     }
