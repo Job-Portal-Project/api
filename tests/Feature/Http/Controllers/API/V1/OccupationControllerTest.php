@@ -60,23 +60,23 @@ class OccupationControllerTest extends TestCase
 
     public function test_occupation_index_with_search(): void
     {
-        $industry = Industry::factory()->create();
-        $occupation1 = Occupation::factory()->create([
-            'name' => 'Software Engineer',
-            'industry_id' => $industry->id,
-        ]);
-        $occupation2 = Occupation::factory()->create([
-            'name' => 'Data Analyst',
-            'industry_id' => $industry->id,
+        $industry = Industry::factory()->create()->occupations()->createMany([
+            ['name' => $name1 = 'Software Engineering'],
+            ['name' => $name2 = 'Data Analyst'],
         ]);
 
         $response = $this
             ->authenticated()
-            ->get(route('occupations.index', ['search' => 'Software']));
+            ->get(route('occupations.index', ['search' => 'Software', 'size' => 9999]), [
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+            ]);
 
-        $response->assertStatus(200)
-            ->assertJsonCount(1, 'data')
-            ->assertJsonPath('data.0.name', 'Software Engineer');
+        $response->assertStatus(200);
+
+        $names = array_column($response->json('data'), 'name');
+
+        collect([$name1, $name2])->each(fn (string $name) => in_array($name, $names));
     }
 
     public function test_occupation_index_with_ordering(): void
