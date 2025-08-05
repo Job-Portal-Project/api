@@ -5,14 +5,14 @@ namespace Tests\Feature\Repositories;
 use App\Models\JWT\Token;
 use App\Models\User;
 use App\Repositories\UserRepository;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Collection;
 use Tests\TestCase;
 
 class UserRepositoryTest extends TestCase
 {
-    use DatabaseTransactions, WithFaker;
+    use RefreshDatabase, WithFaker;
 
     public function test_create_method_creating_users_correctly(): void
     {
