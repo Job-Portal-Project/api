@@ -5,10 +5,7 @@ namespace Tests\Feature\Http\Controllers\API\V1;
 use App\Contracts\JWT\TokenServiceInterface;
 use App\Models\User;
 use App\Repositories\UserRepository;
-use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class IndustryControllerTest extends TestCase
@@ -43,7 +40,7 @@ class IndustryControllerTest extends TestCase
         $response->assertStatus(200);
         $data = $response->json('data');
 
-        if (!empty($data)) {
+        if (! empty($data)) {
             $this->assertArrayNotHasKey('occupations', $data[0]);
         }
     }
@@ -57,7 +54,7 @@ class IndustryControllerTest extends TestCase
         $response->assertStatus(200);
         $data = $response->json('data');
 
-        if (!empty($data)) {
+        if (! empty($data)) {
             $this->assertArrayHasKey('occupations', $data[0]);
         }
     }
@@ -72,7 +69,7 @@ class IndustryControllerTest extends TestCase
             ->withHeaders([
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
-                'Authorization' => "Bearer " . $user->new_tokens->get(0)->token->toString(),
+                'Authorization' => 'Bearer '.$user->getAttribute('new_tokens')->get(0)->token->toString(),
             ]);
     }
 }
