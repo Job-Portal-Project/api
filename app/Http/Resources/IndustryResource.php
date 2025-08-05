@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,7 +16,7 @@ class IndustryResource extends JsonResource
     {
         $data = parent::toArray($request);
 
-        foreach($this->resource->getRelations() ?? [] as $name => $relationData) {
+        foreach ($this->resource->getRelations() ?? [] as $name => $relationData) {
             $data[$name] = $relationData->toArray();
         }
 

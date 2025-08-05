@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Industry;
 use App\Models\Occupation;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class IndustrySeeder extends Seeder
