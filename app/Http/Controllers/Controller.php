@@ -67,6 +67,91 @@ use OpenApi\Attributes as OA;
         ),
     ]
 )]
+#[OA\Schema(
+    schema: 'Industry',
+    title: 'Industry',
+    description: 'Industry model representing business sectors',
+    properties: [
+        new OA\Property(
+            property: 'id',
+            type: 'integer',
+            example: 1,
+            description: 'Unique industry identifier'
+        ),
+        new OA\Property(
+            property: 'name',
+            type: 'string',
+            example: 'Technology',
+            description: 'Industry name'
+        ),
+        new OA\Property(
+            property: 'created_at',
+            type: 'string',
+            format: 'date-time',
+            example: '2024-01-15T10:30:00.000000Z',
+            description: 'Timestamp when the industry was created'
+        ),
+        new OA\Property(
+            property: 'updated_at',
+            type: 'string',
+            format: 'date-time',
+            example: '2024-01-15T10:30:00.000000Z',
+            description: 'Timestamp when the industry was last updated'
+        ),
+        new OA\Property(
+            property: 'occupations',
+            type: 'array',
+            items: new OA\Items(ref: '#/components/schemas/Occupation'),
+            description: 'Array of related occupations (only included when relations[occupations] is requested or in show endpoint)',
+            nullable: true
+        ),
+    ]
+)]
+#[OA\Schema(
+    schema: 'Occupation',
+    title: 'Occupation',
+    description: 'Occupation model representing job roles within industries',
+    properties: [
+        new OA\Property(
+            property: 'id',
+            type: 'integer',
+            example: 1,
+            description: 'Unique occupation identifier'
+        ),
+        new OA\Property(
+            property: 'name',
+            type: 'string',
+            example: 'Software Engineer',
+            description: 'Occupation name'
+        ),
+        new OA\Property(
+            property: 'industry_id',
+            type: 'integer',
+            example: 1,
+            description: 'ID of the industry this occupation belongs to'
+        ),
+        new OA\Property(
+            property: 'created_at',
+            type: 'string',
+            format: 'date-time',
+            example: '2024-01-15T10:30:00.000000Z',
+            description: 'Timestamp when the occupation was created'
+        ),
+        new OA\Property(
+            property: 'updated_at',
+            type: 'string',
+            format: 'date-time',
+            example: '2024-01-15T10:30:00.000000Z',
+            description: 'Timestamp when the occupation was last updated'
+        ),
+        new OA\Property(
+            property: 'industry',
+            ref: '#/components/schemas/Industry',
+            description: 'Related industry object (when relationship is loaded)',
+            nullable: true
+        ),
+    ]
+)]
 abstract class Controller
 {
     //
