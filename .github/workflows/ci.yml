@@ -52,7 +52,7 @@ jobs:
       postgres:
         image: postgres:16
         env:
-          POSTGRES_DB: jobportal_test
+          POSTGRES_DB: app
           POSTGRES_USER: laravel
           POSTGRES_PASSWORD: secret
         options: >-
@@ -90,7 +90,7 @@ jobs:
       - name: Configure PostgreSQL for testing
         run: |
           sed -i 's/DB_HOST=127.0.0.1/DB_HOST=localhost/' .env
-          sed -i 's/DB_DATABASE=jobportal/DB_DATABASE=jobportal_test/' .env
+          sed -i 's/DB_DATABASE=jobportal/DB_DATABASE=app/' .env
           sed -i 's/DB_USERNAME=root/DB_USERNAME=laravel/' .env
           sed -i 's/DB_PASSWORD=/DB_PASSWORD=secret/' .env
 
