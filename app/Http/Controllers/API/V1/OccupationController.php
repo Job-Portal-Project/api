@@ -4,7 +4,6 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\OccupationResource;
-use App\Models\Industry;
 use App\Models\Occupation;
 use Illuminate\Http\Request;
 
@@ -34,7 +33,7 @@ class OccupationController extends Controller
         $occupations = Occupation::query()
             ->when(
                 $filters['search'],
-                fn($query, $needle) => $query->where(
+                fn ($query, $needle) => $query->where(
                     'name',
                     'LIKE',
                     "%{$needle}%"

@@ -87,7 +87,7 @@ trait AuthTestHelpers
         $token = $token ?? $user->json('new_tokens.0.token');
 
         return $this->get(route('auth.me'), [
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
             'Accept' => 'application/json',
         ]);
     }
@@ -109,7 +109,7 @@ trait AuthTestHelpers
 
         return $this->delete(route('auth.revoke'), [], [
             'Accept' => 'application/json',
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ]);
     }
 
@@ -121,7 +121,7 @@ trait AuthTestHelpers
 
         return $this->post(route('auth.refresh'), [], [
             'Accept' => 'application/json',
-            'Authorization' => 'Bearer ' . $token,
+            'Authorization' => 'Bearer '.$token,
         ]);
     }
 }
