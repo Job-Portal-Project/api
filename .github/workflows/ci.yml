@@ -107,7 +107,7 @@ jobs:
         run: APP_ENV=testing php artisan jwt:generate-keys
 
       - name: Run tests
-        run: vendor/bin/phpunit --coverage-clover coverage.xml
+        run: DB_HOST=localhost vendor/bin/phpunit --coverage-clover coverage.xml
 
       - name: Upload coverage to Codecov
         if: matrix.php-version == '8.2'
