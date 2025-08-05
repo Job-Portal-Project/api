@@ -353,6 +353,492 @@
                     }
                 ]
             }
+        },
+        "/industries": {
+            "get": {
+                "tags": [
+                    "Industries"
+                ],
+                "summary": "Get paginated list of industries",
+                "description": "Retrieve a paginated list of industries with filtering, searching, and sorting capabilities. Optionally include related occupations. Supports full-text search by industry name.",
+                "operationId": "5967c7862d5b84792416543636d6d686",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination (starts from 1)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "description": "Number of items per page (1-100)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1,
+                            "example": 10
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "Sort direction",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ],
+                            "example": "asc"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Field to sort by",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "id",
+                                "name",
+                                "created_at",
+                                "updated_at"
+                            ],
+                            "example": "id"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search term to filter industries by name (case-insensitive partial match)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Technology"
+                        }
+                    },
+                    {
+                        "name": "relations[occupations]",
+                        "in": "query",
+                        "description": "Include related occupations in the response (set to \"1\" or \"true\" to include)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "0",
+                                "1",
+                                "false",
+                                "true"
+                            ],
+                            "example": "1"
+                        }
+                    },
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "Preferred language for response messages",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "en"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of industries retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "description": "Array of industry objects",
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Industry"
+                                            }
+                                        },
+                                        "links": {
+                                            "description": "Pagination links",
+                                            "properties": {
+                                                "first": {
+                                                    "type": "string",
+                                                    "example": "http://localhost/api/v1/industries?page=1"
+                                                },
+                                                "last": {
+                                                    "type": "string",
+                                                    "example": "http://localhost/api/v1/industries?page=10"
+                                                },
+                                                "prev": {
+                                                    "type": "string",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "next": {
+                                                    "type": "string",
+                                                    "example": "http://localhost/api/v1/industries?page=2"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "description": "Pagination metadata",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 95
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error - Invalid query parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/industries/{industry}": {
+            "get": {
+                "tags": [
+                    "Industries"
+                ],
+                "summary": "Get specific industry by ID",
+                "description": "Retrieve a specific industry by its ID. Always includes related occupations in the response to provide complete industry information.",
+                "operationId": "9631b6afd03fcc50e0e9dcbe97e12b44",
+                "parameters": [
+                    {
+                        "name": "industry",
+                        "in": "path",
+                        "description": "Industry ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "Preferred language for response messages",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "en"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Industry retrieved successfully with related occupations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Industry"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Industry not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error message indicating the industry was not found",
+                                            "type": "string",
+                                            "example": "No query results for model [App\\Models\\Industry] 999"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/occupations": {
+            "get": {
+                "tags": [
+                    "Occupations"
+                ],
+                "summary": "Get paginated list of occupations",
+                "description": "Retrieve a paginated list of occupations with filtering, searching, and sorting capabilities. Supports full-text search by occupation name.",
+                "operationId": "82221ea60dbba94666619150e93540ed",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number for pagination (starts from 1)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "size",
+                        "in": "query",
+                        "description": "Number of items per page (1-100)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1,
+                            "example": 10
+                        }
+                    },
+                    {
+                        "name": "order",
+                        "in": "query",
+                        "description": "Sort direction",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ],
+                            "example": "asc"
+                        }
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "description": "Field to sort by",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "id",
+                                "name",
+                                "created_at",
+                                "updated_at"
+                            ],
+                            "example": "id"
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Search term to filter occupations by name (case-insensitive partial match)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Engineer"
+                        }
+                    },
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "Preferred language for response messages",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "en"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of occupations retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "description": "Array of occupation objects",
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Occupation"
+                                            }
+                                        },
+                                        "links": {
+                                            "description": "Pagination links",
+                                            "properties": {
+                                                "first": {
+                                                    "type": "string",
+                                                    "example": "http://localhost/api/v1/occupations?page=1"
+                                                },
+                                                "last": {
+                                                    "type": "string",
+                                                    "example": "http://localhost/api/v1/occupations?page=25"
+                                                },
+                                                "prev": {
+                                                    "type": "string",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "next": {
+                                                    "type": "string",
+                                                    "example": "http://localhost/api/v1/occupations?page=2"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "meta": {
+                                            "description": "Pagination metadata",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "from": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 25
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "to": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 245
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error - Invalid query parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/occupations/{occupation}": {
+            "get": {
+                "tags": [
+                    "Occupations"
+                ],
+                "summary": "Get specific occupation by ID",
+                "description": "Retrieve a specific occupation by its ID. Returns basic occupation information without related industry data to keep response lightweight.",
+                "operationId": "5391d690ac9e5aa27a961d826f0cdd31",
+                "parameters": [
+                    {
+                        "name": "occupation",
+                        "in": "path",
+                        "description": "Occupation ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "Accept-Language",
+                        "in": "header",
+                        "description": "Preferred language for response messages",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "en"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Occupation retrieved successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/Occupation"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Occupation not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "description": "Error message indicating the occupation was not found",
+                                            "type": "string",
+                                            "example": "No query results for model [App\\Models\\Occupation] 999"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -390,6 +876,86 @@
                         "description": "Authentication error message",
                         "type": "string",
                         "example": "Unauthenticated."
+                    }
+                },
+                "type": "object"
+            },
+            "Industry": {
+                "title": "Industry",
+                "description": "Industry model representing business sectors",
+                "properties": {
+                    "id": {
+                        "description": "Unique industry identifier",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Industry name",
+                        "type": "string",
+                        "example": "Technology"
+                    },
+                    "created_at": {
+                        "description": "Timestamp when the industry was created",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15T10:30:00.000000Z"
+                    },
+                    "updated_at": {
+                        "description": "Timestamp when the industry was last updated",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15T10:30:00.000000Z"
+                    },
+                    "occupations": {
+                        "description": "Array of related occupations (only included when relations[occupations] is requested or in show endpoint)",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Occupation"
+                        },
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "Occupation": {
+                "title": "Occupation",
+                "description": "Occupation model representing job roles within industries",
+                "properties": {
+                    "id": {
+                        "description": "Unique occupation identifier",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "name": {
+                        "description": "Occupation name",
+                        "type": "string",
+                        "example": "Software Engineer"
+                    },
+                    "industry_id": {
+                        "description": "ID of the industry this occupation belongs to",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "created_at": {
+                        "description": "Timestamp when the occupation was created",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15T10:30:00.000000Z"
+                    },
+                    "updated_at": {
+                        "description": "Timestamp when the occupation was last updated",
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2024-01-15T10:30:00.000000Z"
+                    },
+                    "industry": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/Industry"
+                            }
+                        ],
+                        "nullable": true,
+                        "description": "Related industry object (when relationship is loaded)"
                     }
                 },
                 "type": "object"
@@ -511,6 +1077,14 @@
         {
             "name": "Authentication",
             "description": "User authentication and registration endpoints with RSA-512 signed JWT tokens. Supports both access and refresh tokens with database storage and automatic revocation."
+        },
+        {
+            "name": "Industries",
+            "description": "Industry management endpoints. Industries represent broad categories of business sectors (e.g., Technology, Healthcare, Finance) and can contain multiple occupations. Supports filtering, searching, sorting, and optional relation loading."
+        },
+        {
+            "name": "Occupations",
+            "description": "Occupation management endpoints. Occupations represent specific job roles within industries (e.g., Software Engineer, Data Analyst, Marketing Manager). Supports filtering, searching, and sorting capabilities."
         }
     ]
 }
