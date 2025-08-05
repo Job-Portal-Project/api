@@ -2,13 +2,13 @@
 
 namespace Tests\Assets\Traits;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\TestResponse;
 
 trait AuthTestHelpers
 {
-    use RefreshDatabase, WithFaker;
+    use DatabaseTransactions, WithFaker;
 
     protected array $userResponseStructure;
 
@@ -87,7 +87,7 @@ trait AuthTestHelpers
         $token = $token ?? $user->json('new_tokens.0.token');
 
         return $this->get(route('auth.me'), [
-            'Authorization' => 'Bearer '.$token,
+            'Authorization' => 'Bearer ' . $token,
             'Accept' => 'application/json',
         ]);
     }
@@ -109,7 +109,7 @@ trait AuthTestHelpers
 
         return $this->delete(route('auth.revoke'), [], [
             'Accept' => 'application/json',
-            'Authorization' => 'Bearer '.$token,
+            'Authorization' => 'Bearer ' . $token,
         ]);
     }
 
@@ -121,7 +121,7 @@ trait AuthTestHelpers
 
         return $this->post(route('auth.refresh'), [], [
             'Accept' => 'application/json',
-            'Authorization' => 'Bearer '.$token,
+            'Authorization' => 'Bearer ' . $token,
         ]);
     }
 }

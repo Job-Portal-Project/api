@@ -40,7 +40,7 @@ class IndustryControllerTest extends TestCase
         $response->assertStatus(200);
         $data = $response->json('data');
 
-        if (! empty($data)) {
+        if (!empty($data)) {
             $this->assertArrayNotHasKey('occupations', $data[0]);
         }
     }
@@ -54,7 +54,7 @@ class IndustryControllerTest extends TestCase
         $response->assertStatus(200);
         $data = $response->json('data');
 
-        if (! empty($data)) {
+        if (!empty($data)) {
             $this->assertArrayHasKey('occupations', $data[0]);
         }
     }
@@ -69,7 +69,7 @@ class IndustryControllerTest extends TestCase
             ->withHeaders([
                 'Accept' => 'application/json',
                 'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer '.$user->getAttribute('new_tokens')->get(0)->token->toString(),
+                'Authorization' => 'Bearer ' . $user->getAttribute('new_tokens')->get(0)->token->toString(),
             ]);
     }
 }
