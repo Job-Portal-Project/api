@@ -48,6 +48,21 @@ jobs:
       matrix:
         php-version: ['8.2', '8.3', '8.4']
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: app
+          POSTGRES_USER: laravel
+          POSTGRES_PASSWORD: secret
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -56,7 +71,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, pgsql, pdo_pgsql, bcmath, soap, intl, gd, exif, iconv
           coverage: xdebug
 
       - name: Cache Composer dependencies
@@ -72,25 +87,27 @@ jobs:
       - name: Create environment file
         run: cp .env.example .env
 
-      - name: Set database to SQLite for testing
+      - name: Configure PostgreSQL for testing
         run: |
-          sed -i 's/DB_CONNECTION=pgsql/DB_CONNECTION=sqlite/' .env
-          sed -i 's/DB_DATABASE=jobportal/DB_DATABASE=database\/database.sqlite/' .env
+          sed -i 's/DB_HOST=127.0.0.1/DB_HOST=localhost/' .env
+          sed -i 's/DB_DATABASE=jobportal/DB_DATABASE=app/' .env
+          sed -i 's/DB_USERNAME=root/DB_USERNAME=laravel/' .env
+          sed -i 's/DB_PASSWORD=/DB_PASSWORD=secret/' .env
 
       - name: Generate application key
         run: php artisan key:generate
 
-      - name: Create database
-        run: touch database/database.sqlite
-
       - name: Run database migrations
         run: php artisan migrate --force
+
+      - name: Run database seeders
+        run: php artisan db:seed --force
 
       - name: Generate keys
         run: APP_ENV=testing php artisan jwt:generate-keys
 
       - name: Run tests
-        run: vendor/bin/phpunit --coverage-clover coverage.xml
+        run: DB_HOST=localhost vendor/bin/phpunit --coverage-clover coverage.xml
 
       - name: Upload coverage to Codecov
         if: matrix.php-version == '8.2'
