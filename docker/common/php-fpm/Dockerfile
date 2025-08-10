@@ -79,10 +79,11 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 # Copy the initial storage structure
 COPY ./storage /var/www/storage-init
 
-# Copy PHP extensions and libraries from the builder stage
+# Copy PHP extensions, libraries, and composer from the builder stage
 COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
 COPY --from=builder /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
 COPY --from=builder /usr/local/bin/docker-php-ext-* /usr/local/bin/
+COPY --from=builder /usr/local/bin/composer /usr/local/bin/composer
 
 # Use the recommended production PHP configuration
 # -----------------------------------------------------------
