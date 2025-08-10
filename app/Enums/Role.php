@@ -2,10 +2,14 @@
 
 namespace App\Enums;
 
+use Kongulov\Traits\InteractWithEnum;
+
 enum Role: string
 {
-    case ADMIN = 'Admin';
-    case MODERATOR = 'Moderator';
-    case COMPANY = 'Company';
-    case CANDIDATE = 'Candidate';
+    use InteractWithEnum;
+
+    case ADMIN = 'admin';
+    case MODERATOR = 'moderator';
+    case COMPANY = 'company';
+    case CANDIDATE = 'candidate';
 }

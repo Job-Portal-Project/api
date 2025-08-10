@@ -19,12 +19,12 @@ class UserSeeder extends Seeder
             'shahmal1yevv@proton.me' => ['role' => Role::ADMIN->value, 'name' => 'Eldar Shahmaliyev'],
             'qasimzadeali4@gmail.com' => ['role' => Role::ADMIN->value, 'name' => 'Ali Qasimzade'],
             'idrismikayil@gmail.com' => ['role' => Role::ADMIN->value, 'name' => 'Idris Mikayilov'],
+            'john.doe@example.com' => ['role' => Role::CANDIDATE->value, 'name' => 'John Doe'],
         ]);
 
         $data->map(function ($user, $email): User {
             $user = User::query()->firstOrCreate(['email' => $email], [
                 'email' => $email,
-                'name' => $user['name'],
                 'password' => Hash::make(Str::random()),
             ]);
 
