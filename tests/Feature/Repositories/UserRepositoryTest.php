@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Repositories;
 
+use App\Enums\Role;
 use App\Models\JWT\Token;
 use App\Models\User;
 use App\Repositories\UserRepository;
@@ -19,9 +20,12 @@ class UserRepositoryTest extends TestCase
         $repository = app()->make(UserRepository::class);
 
         $userData = [
-            'name' => $this->faker->name,
             'email' => $this->faker->safeEmail,
             'password' => $this->faker->password,
+            'role' => Role::CANDIDATE->value,
+            'data' => [
+                'name' => $this->faker->name,
+            ]
         ];
 
         $user = $repository->create($userData);

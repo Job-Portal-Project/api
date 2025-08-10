@@ -8,11 +8,12 @@ use App\Models\Occupation;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\Assets\Traits\AuthTestHelpers;
 use Tests\TestCase;
 
 class OccupationControllerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use AuthTestHelpers;
 
     public function test_occupation_index_requires_authentication(): void
     {
@@ -167,19 +168,5 @@ class OccupationControllerTest extends TestCase
 
         $response->assertStatus(200)
             ->assertJsonCount(0, 'data');
-    }
-
-    private function authenticated(): OccupationControllerTest
-    {
-        $user = (new UserRepository(app()->make(TokenServiceInterface::class)))->create(
-            User::factory()->definition(),
-        );
-
-        return $this->actingAs($user, 'api')
-            ->withHeaders([
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer '.$user->getAttribute('new_tokens')->get(0)->token->toString(),
-            ]);
     }
 }

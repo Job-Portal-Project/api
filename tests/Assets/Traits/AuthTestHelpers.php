@@ -2,6 +2,11 @@
 
 namespace Tests\Assets\Traits;
 
+use App\Contracts\JWT\TokenServiceInterface;
+use App\Enums\Role;
+use App\Models\Candidate;
+use App\Models\User;
+use App\Repositories\UserRepository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\TestResponse;
@@ -127,5 +132,21 @@ trait AuthTestHelpers
             'Accept' => 'application/json',
             'Authorization' => 'Bearer '.$token,
         ]);
+    }
+
+    private function authenticated(): static
+    {
+        $user = (new UserRepository(app()->make(TokenServiceInterface::class)))->create(array_merge(
+            User::factory()->definition(),
+            ['role' => Role::CANDIDATE->value],
+            ['data' => Candidate::factory()->definition()]
+        ));
+
+        return $this->actingAs($user, 'api')
+            ->withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer '.$user->getAttribute('new_tokens')->get(0)->token->toString(),
+            ]);
     }
 }

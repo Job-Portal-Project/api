@@ -3,16 +3,20 @@
 namespace Tests\Feature\Http\Controllers\API\V1;
 
 use App\Contracts\JWT\TokenServiceInterface;
+use App\Enums\Role;
+use App\Models\Candidate;
 use App\Models\Industry;
 use App\Models\Occupation;
 use App\Models\User;
 use App\Repositories\UserRepository;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Tests\Assets\Traits\AuthTestHelpers;
 use Tests\TestCase;
 
 class IndustryControllerTest extends TestCase
 {
     use DatabaseTransactions;
+    use AuthTestHelpers;
 
     public function test_industry_index_requires_authentication(): void
     {
@@ -140,19 +144,5 @@ class IndustryControllerTest extends TestCase
             ->get(route('industries.show', 999));
 
         $response->assertStatus(404);
-    }
-
-    private function authenticated(): IndustryControllerTest
-    {
-        $user = (new UserRepository(app()->make(TokenServiceInterface::class)))->create(
-            User::factory()->definition(),
-        );
-
-        return $this->actingAs($user, 'api')
-            ->withHeaders([
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer '.$user->getAttribute('new_tokens')->get(0)->token->toString(),
-            ]);
     }
 }
