@@ -4,8 +4,11 @@ namespace App\Repositories;
 
 use App\Contracts\JWT\TokenServiceInterface;
 use App\Enums\Role;
+use App\Models\Admin;
 use App\Models\Candidate;
+use App\Models\Company;
 use App\Models\JWT\Token;
+use App\Models\Moderator;
 use App\Models\User;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Arr;
@@ -71,6 +74,9 @@ class UserRepository extends AbstractRepository
     {
         $model = match ($role->getAttribute('name')) {
             Role::CANDIDATE->value => Candidate::class,
+            Role::ADMIN->value => Admin::class,
+            Role::MODERATOR->value => Moderator::class,
+            Role::COMPANY->value => Company::class,
         };
 
         return $model::query()->create($data);

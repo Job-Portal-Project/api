@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Authenticated;
 
+use App\Enums\Role;
 use App\Http\Resources\Authenticated\UserResource as BaseResource;
 use App\Models\Candidate;
 use App\Models\User;
@@ -12,7 +13,9 @@ class CandidateResource extends BaseResource
     public function toArray(Request $request): array
     {
         return array_merge(parent::toArray($request), [
-            'name' => $this->resource()->getAttribute('name'),
+            'profile' => [
+                'name' => $this->resource(Role::CANDIDATE)->getAttribute('name'),
+            ]
         ]);
     }
 }

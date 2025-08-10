@@ -21,8 +21,6 @@ class StoreRequest extends \App\Http\Requests\User\StoreRequest
     {
         return array_merge(parent::rules(), [
             'data.name' => 'required|string|max:255',
-            'data.phone' => 'nullable|string|max:20',
-            'data.birth_date' => 'nullable|date',
         ]);
     }
 }

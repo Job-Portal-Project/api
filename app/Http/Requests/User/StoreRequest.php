@@ -3,16 +3,16 @@
 namespace App\Http\Requests\User;
 
 use App\Enums\Role;
-use App\Http\Requests\User\Candidate\StoreRequest as CandidateStoreRequest;
-use App\Http\Requests\User\Company\StoreRequest as CompanyStoreRequest;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
 class StoreRequest extends FormRequest
 {
     public const ROLE_REQUEST_MAPPING = [
-        Role::CANDIDATE->value => CandidateStoreRequest::class,
-        Role::COMPANY->value => CompanyStoreRequest::class,
+        Role::CANDIDATE->value => Candidate\StoreRequest::class,
+        Role::COMPANY->value => Company\StoreRequest::class,
+        Role::ADMIN->value => Admin\StoreRequest::class,
+        Role::MODERATOR->value => Moderator\StoreRequest::class,
     ];
 
     /**

@@ -3,7 +3,10 @@
 namespace App\Factories\User;
 
 use App\Enums\Role;
+use App\Http\Resources\Authenticated\AdminResource;
 use App\Http\Resources\Authenticated\CandidateResource;
+use App\Http\Resources\Authenticated\CompanyResource;
+use App\Http\Resources\Authenticated\ModeratorResource;
 use App\Http\Resources\Authenticated\UserResource;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -13,11 +16,11 @@ use Spatie\Permission\Traits\HasRoles;
 
 class ResourceFactory extends UserResource
 {
-    private const ROLE_RESOURCE_MAPPING = [
+    public const ROLE_RESOURCE_MAPPING = [
         Role::CANDIDATE->value => CandidateResource::class,
-        Role::COMPANY->value => UserResource::class,
-        Role::MODERATOR->value => UserResource::class,
-        Role::ADMIN->value => UserResource::class,
+        Role::COMPANY->value => CompanyResource::class,
+        Role::MODERATOR->value => ModeratorResource::class,
+        Role::ADMIN->value => AdminResource::class,
     ];
 
     /**

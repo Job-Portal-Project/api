@@ -20,6 +20,11 @@ class TokenServiceProvider extends ServiceProvider
     {
         // Bind the TokenServiceInterface to the TokenService implementation
         $this->app->bind(TokenServiceInterface::class, TokenService::class);
+        $this->app->bind(StoreRequest::class, function () {
+            $role = request()->input('role', Role::CANDIDATE->value);
+
+            return app(StoreRequest::ROLE_REQUEST_MAPPING[$role]);
+        });
     }
 
     /**
@@ -35,12 +40,5 @@ class TokenServiceProvider extends ServiceProvider
                 Auth::createUserProvider($config['provider'])
             );
         });
-
-        $this->app->when(StoreRequest::class)
-            ->give(function () {
-                $role = request()->input('role', Role::CANDIDATE->value);
-
-                return new (StoreRequest::ROLE_REQUEST_MAPPING[$role]);
-            });
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Authenticated;
 
+use App\Enums\Role;
 use App\Http\Resources\TokenResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -73,17 +74,18 @@ class UserResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return array_merge(parent::toArray($request), [
+        return array_merge([
+            'id' => $this->resource->getKey(),
+            'email' => $this->resource->getAttribute('email'),
+            'created_at' => $this->resource->getAttribute('created_at'),
+            'updated_at' => $this->resource->getAttribute('updated_at'),
+            'role' => $this->resource->getAttribute('role'),
             'new_tokens' => $this->whenHas('new_tokens', fn () => TokenResource::collection($this->resource->getAttribute('new_tokens'))),
         ]);
     }
 
-    protected function resource()
+    protected function resource(Role $role)
     {
-        if ($this->resource instanceof User) {
-            return $this->resource->getAttribute('candidate');
-        }
-
-        return $this->resource;
+        return $this->resource->profile($role);
     }
 }

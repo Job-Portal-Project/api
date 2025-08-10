@@ -20,9 +20,7 @@ class StoreRequest extends \App\Http\Requests\User\StoreRequest
     public function rules(): array
     {
         return array_merge(parent::rules(), [
-            'data.company_name' => 'required|string|max:255',
-            'data.tax_id' => 'required|string|max:50',
-            'data.website' => 'nullable|url',
+            'data.website' => 'required|integer',
         ]);
     }
 }

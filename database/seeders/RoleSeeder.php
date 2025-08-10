@@ -14,7 +14,7 @@ class RoleSeeder extends Seeder
     public function run(): void
     {
         foreach (RoleEnum::values() as $role) {
-            Role::query()->firstOrCreate(['name' => $role], ['name' => $role]);
+            Role::query()->firstOrCreate(['name' => $role], ['name' => $role, 'guard_name' => 'api']);
         }
     }
 }
