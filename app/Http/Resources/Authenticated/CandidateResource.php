@@ -15,13 +15,4 @@ class CandidateResource extends BaseResource
             'name' => $this->resource()->getAttribute('name'),
         ]);
     }
-
-    private function resource()
-    {
-        if ($this->resource instanceof User) {
-            return $this->resource->getAttribute('candidate');
-        }
-
-        return $this->resource;
-    }
 }

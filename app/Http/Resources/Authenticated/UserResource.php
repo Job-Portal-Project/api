@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Authenticated;
 
 use App\Http\Resources\TokenResource;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use OpenApi\Attributes as OA;
@@ -75,5 +76,14 @@ class UserResource extends JsonResource
         return array_merge(parent::toArray($request), [
             'new_tokens' => $this->whenHas('new_tokens', fn () => TokenResource::collection($this->resource->getAttribute('new_tokens'))),
         ]);
+    }
+
+    protected function resource()
+    {
+        if ($this->resource instanceof User) {
+            return $this->resource->getAttribute('candidate');
+        }
+
+        return $this->resource;
     }
 }
