@@ -3,9 +3,12 @@
 namespace App\Repositories;
 
 use App\Contracts\JWT\TokenServiceInterface;
+use App\Enums\Role;
+use App\Models\Candidate;
 use App\Models\JWT\Token;
 use App\Models\User;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Lcobucci\JWT\UnencryptedToken;
@@ -22,9 +25,19 @@ class UserRepository extends AbstractRepository
 
     public function create(array $data): Authenticatable
     {
-        $user = DB::transaction(function () use ($data) {
+        $profileData = Arr::pull($data, 'data');
+        $userData = $data;
+        $user = DB::transaction(function () use ($profileData, $userData) {
             /** @var User $user */
-            $user = parent::create($data);
+            $role = \Spatie\Permission\Models\Role::query()->firstWhere(
+                'name',
+                Role::from(Arr::pull($userData, 'role'))->value
+            );
+            $user = parent::create($userData);
+            $user->assignRole($role);
+            $this->createProfile($role, array_merge($profileData, [
+                'user_id' => $user->getKey()
+            ]));
 
             $tokenPayloads = $this->service->data(sub: ((string) $user->getAuthIdentifier()));
 
@@ -52,5 +65,14 @@ class UserRepository extends AbstractRepository
         });
 
         return $user;
+    }
+
+    public function createProfile(\Spatie\Permission\Models\Role $role, array $data)
+    {
+        $model = match ($role->getAttribute('name')) {
+            Role::CANDIDATE->value => Candidate::class,
+        };
+
+        return $model::query()->create($data);
     }
 }

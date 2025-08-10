@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Contracts\JWT\TokenServiceInterface;
+use App\Enums\Role;
+use App\Http\Requests\User\StoreRequest;
 use App\Services\Auth\Guard\TokenGuard;
 use App\Services\TokenService;
 use Illuminate\Auth\RequestGuard;
@@ -33,5 +35,12 @@ class TokenServiceProvider extends ServiceProvider
                 Auth::createUserProvider($config['provider'])
             );
         });
+
+        $this->app->when(StoreRequest::class)
+            ->give(function () {
+                $role = request()->input('role', Role::CANDIDATE->value);
+
+                return new (StoreRequest::ROLE_REQUEST_MAPPING[$role]);
+            });
     }
 }
