@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Factories\User\ResourceFactory;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\User\StoreRequest;
 use App\Http\Resources\TokenResource;
-use App\Http\Resources\UserResource;
 use App\Models\JWT\Token;
 use App\Models\User;
 use App\Repositories\TokenRepository;
@@ -101,14 +103,9 @@ class AuthController extends Controller
             ),
         ]
     )]
-    public function register(Request $request, UserRepository $repository): JsonResponse
+    public function register(StoreRequest $request, UserRepository $repository): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:8',
-            'passwordConfirm' => 'required|same:password',
-        ]);
+        $validated = $request->validated();
 
         $user = $repository->create($validated);
         $response = $this->userResponse($user, Response::HTTP_CREATED);
@@ -179,12 +176,9 @@ class AuthController extends Controller
             ),
         ]
     )]
-    public function authenticate(Request $request, TokenRepository $repository): JsonResponse
+    public function authenticate(LoginRequest $request, TokenRepository $repository): JsonResponse
     {
-        [$email, $password] = array_values($request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]));
+        [$email, $password] = array_values($request->validated());
 
         $user = User::where('email', $email)->first();
 
@@ -341,7 +335,7 @@ class AuthController extends Controller
      */
     private function userResponse(?Authenticatable $record, int $status = 200): JsonResponse
     {
-        $resource = new UserResource($record);
+        $resource = new ResourceFactory($record);
         $response = new JsonResponse($resource, $status);
 
         return $response;
