@@ -66,6 +66,10 @@ trait AuthTestHelpers
             'email' => $this->faker->unique()->safeEmail,
             'password' => 'password',
             'passwordConfirm' => 'password',
+            'role' => 'candidate',
+            'data' => [
+                'name' => 'John Doe',
+            ]
         ], $overrides);
 
         if (isset($overrides['password'])) {
